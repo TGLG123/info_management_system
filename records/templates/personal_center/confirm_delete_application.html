@@ -1,0 +1,138 @@
+{#用户申请删除已审批数据的页面。#}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>申请删除已审批数据</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 900px;
+            margin-top: 50px;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #007bff;
+            font-weight: bold;
+        }
+        .card-header {
+            background-color: #f1f1f1;  /* 淡色背景 */
+            color: #007bff;
+            font-weight: bold;
+            border-bottom: 2px solid #007bff;
+        }
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .data-item {
+            flex: 0 0 48%;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            color: #000000;  /* 黑色文字 */
+        }
+        .data-item strong {
+            color: #000000;  /* 强调文字也使用黑色 */
+        }
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+        }
+        .btn-custom {
+            width: 48%;
+        }
+        textarea {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="text-center mb-4">申请删除已审批数据</h2>
+
+    <!-- 记录详情展示 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">记录详情</h5>
+        </div>
+        <div class="card-body">
+            <div class="data-row">
+                <div class="data-item"><strong>掌子面编号：</strong> {{ record.face_id }}</div>
+                <div class="data-item"><strong>施工项目编号：</strong> {{ record.project_id }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>检查日期：</strong> {{ record.inspection_date }}</div>
+                <div class="data-item"><strong>里程：</strong> {{ record.distance }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>设计断面：</strong> {{ record.design_section }}</div>
+                <div class="data-item"><strong>测量人员：</strong> {{ record.inspector }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>测量日期：</strong> {{ record.measurement_date }}</div>
+                <div class="data-item"><strong>开挖宽度：</strong> {{ record.excavation_width }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>开挖高度：</strong> {{ record.excavation_height }}</div>
+                <div class="data-item"><strong>开挖面积：</strong> {{ record.excavation_area }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>开挖方式：</strong> {{ record.excavation_method }}</div>
+                <div class="data-item"><strong>掌子面状态：</strong> {{ record.face_condition }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>毛开挖情况：</strong> {{ record.excavation_condition }}</div>
+                <div class="data-item"><strong>岩石强度：</strong> {{ record.rock_strength }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>风化程度：</strong> {{ record.weathering_degree }}</div>
+                <div class="data-item"><strong>裂缝宽度：</strong> {{ record.crack_width }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>裂缝形态：</strong> {{ record.crack_shape }}</div>
+                <div class="data-item"><strong>渗水状态：</strong> {{ record.water_condition }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>岩爆发育程度：</strong> {{ record.rockburst_tendency }}</div>
+                <div class="data-item"><strong>岩层级别：</strong> {{ record.rock_grade }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>岩溶发育程度：</strong> {{ record.karst_development }}</div>
+                <div class="data-item"><strong>消水状态：</strong> {{ record.water_status }}</div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- 提交表单 -->
+    <form method="POST">
+        {% csrf_token %}
+        <!-- 删除理由 -->
+        <div class="mb-4">
+            <label for="operation_reason" class="form-label">删除申请理由</label>
+            <textarea class="form-control" id="operation_reason" name="operation_reason" rows="4" placeholder="请输入删除申请理由" required></textarea>
+        </div>
+        <div class="btn-group">
+            <button type="submit" class="btn btn-danger btn-custom">提交删除申请</button>
+            <a href="{% url 'user_records_view' %}" class="btn btn-secondary btn-custom">取消</a>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>申请修改超欠挖诊断数据</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 900px;
+            margin-top: 50px;
+        }
+        .btn-custom {
+            width: 100%;
+        }
+        .card {
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            color: #007bff;
+            font-weight: bold;
+            text-align: center;
+            font-size: 2rem;
+        }
+        .card-body {
+            padding: 30px;
+            background-color: #fff;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        .form-control {
+            border-radius: 5px;
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+        }
+        .row .col-md-6 {
+            margin-bottom: 15px;
+        }
+        .text-center {
+            margin-top: 30px;
+        }
+        /*弹框样式*/
+        .error-popup {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff4d4f;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<div id="error-popup" class="error-popup"></div>
+
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            申请修改超欠挖诊断数据
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="inspection_date" class="form-label">检查日期</label>
+                            <input type="date" class="form-control" id="inspection_date" name="inspection_date" value="{{ record.inspection_date }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="inspector" class="form-label">测量人员</label>
+                            <input type="text" class="form-control" id="inspector" name="inspector" value="{{ record.inspector }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="scale" class="form-label">比例尺</label>
+                            <input type="number" class="form-control" id="scale" name="scale" value="{{ record.scale }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="mileage" class="form-label">里程</label>
+                            <input type="number" class="form-control" id="mileage" name="mileage" value="{{ record.mileage }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="design_section" class="form-label">设计断面</label>
+                            <input type="number" class="form-control" id="design_section" name="design_section" value="{{ record.design_section }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="measurement_date" class="form-label">测量日期</label>
+                            <input type="date" class="form-control" id="measurement_date" name="measurement_date" value="{{ record.measurement_date }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="line_x" class="form-label">线路X坐标</label>
+                            <input type="number" class="form-control" id="line_x" name="line_x" value="{{ record.line_x }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="line_y" class="form-label">线路Y坐标</label>
+                            <input type="number" class="form-control" id="line_y" name="line_y" value="{{ record.line_y }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="measured_section" class="form-label">实测断面面积</label>
+                            <input type="number" class="form-control" id="measured_section" name="measured_section" value="{{ record.measured_section }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="reference_section" class="form-label">参考断面面积</label>
+                            <input type="number" class="form-control" id="reference_section" name="reference_section" value="{{ record.reference_section }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="line_height" class="form-label">线路高程</label>
+                            <input type="number" class="form-control" id="line_height" name="line_height" value="{{ record.line_height }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="over_excavation_area" class="form-label">超挖面积</label>
+                            <input type="number" class="form-control" id="over_excavation_area" name="over_excavation_area" value="{{ record.over_excavation_area }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="under_excavation_area" class="form-label">欠挖面积</label>
+                            <input type="number" class="form-control" id="under_excavation_area" name="under_excavation_area" value="{{ record.under_excavation_area }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="max_over_excavation" class="form-label">最大超挖</label>
+                            <input type="number" class="form-control" id="max_over_excavation" name="max_over_excavation" value="{{ record.max_over_excavation }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="max_under_excavation" class="form-label">最大欠挖</label>
+                            <input type="number" class="form-control" id="max_under_excavation" name="max_under_excavation" value="{{ record.max_under_excavation }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="average_over_excavation" class="form-label">平均超挖</label>
+                            <input type="number" class="form-control" id="average_over_excavation" name="average_over_excavation" value="{{ record.average_over_excavation }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="average_under_excavation" class="form-label">平均欠挖</label>
+                            <input type="number" class="form-control" id="average_under_excavation" name="average_under_excavation" value="{{ record.average_under_excavation }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="diagnosis_result" class="form-label">诊断结果</label>
+                            <select class="form-control" id="diagnosis_result" name="diagnosis_result">
+                                <option value="within_limits" {% if record.diagnosis_result == 'within_limits' %}selected{% endif %}>超欠挖合格</option>
+                                <option value="exceeds_limits" {% if record.diagnosis_result == 'exceeds_limits' %}selected{% endif %}>超欠挖超标</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="face_id" class="form-label">超欠挖诊断编号</label>
+                            <input type="text" class="form-control" id="face_id" name="face_id" value="{{ record.face_id }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="project_id" class="form-label">施工项目编号</label>
+                            <input type="text" class="form-control" id="project_id" name="project_id" value="{{ record.project_id }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="operation_reason" class="form-label">操作理由</label>
+                    <textarea class="form-control" id="operation_reason" name="operation_reason" rows="3">{{ record.operation_reason }}</textarea>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-info btn-custom">提交修改申请</button>
+                    <a href="{% url 'user_records_view' %}" class="btn btn-secondary btn-custom mt-2">取消修改</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.querySelector("form").addEventListener("submit", function (event) {
+        event.preventDefault(); // 阻止表单提交
+
+        const requiredFields = [
+            { id: "inspection_date", name: "检查日期" },
+            { id: "inspector", name: "测量人员" },
+            { id: "scale", name: "比例尺" },
+            { id: "mileage", name: "里程" },
+            { id: "design_section", name: "设计断面" },
+            { id: "measurement_date", name: "测量日期" },
+            { id: "line_x", name: "线路X坐标" },
+            { id: "line_y", name: "线路Y坐标" },
+            { id: "measured_section", name: "实测断面面积" },
+            { id: "reference_section", name: "参考断面面积" },
+            { id: "line_height", name: "线路高程" },
+            { id: "over_excavation_area", name: "超挖面积" },
+            { id: "under_excavation_area", name: "欠挖面积" },
+            { id: "max_over_excavation", name: "最大超挖" },
+            { id: "max_under_excavation", name: "最大欠挖" },
+            { id: "average_over_excavation", name: "平均超挖" },
+            { id: "average_under_excavation", name: "平均欠挖" },
+            { id: "diagnosis_result", name: "诊断结果" },
+            { id: "face_id", name: "超欠挖诊断编号" },
+            { id: "project_id", name: "施工项目编号" },
+            { id: "operation_reason", name: "操作理由" },
+        ];
+
+        let missingFields = [];
+
+        requiredFields.forEach(function (field) {
+            const input = document.getElementById(field.id);
+            if (!input || input.value.trim() === "") {
+                missingFields.push(field.name);
+            }
+        });
+
+        if (missingFields.length > 0) {
+            showErrorPopup("请填写以下字段：" + missingFields.join(", "));
+        } else {
+            event.target.submit(); // 提交表单
+        }
+    });
+
+    function showErrorPopup(message) {
+        const popup = document.getElementById("error-popup");
+        popup.innerText = message;
+        popup.style.display = "block";
+
+        setTimeout(function () {
+            popup.style.display = "none";
+        }, 3000); // 3秒后自动隐藏
+    }
+</script>
+
+</body>
+</html>

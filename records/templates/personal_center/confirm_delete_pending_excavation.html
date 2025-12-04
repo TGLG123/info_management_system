@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>确认删除新增待审批数据</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 900px;
+            margin-top: 50px;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #dc3545; /* 红色标题 */
+            font-weight: bold;
+        }
+        .card-header {
+            background-color: #f1f1f1;  /* 淡色背景 */
+            color: #dc3545;
+            font-weight: bold;
+            border-bottom: 2px solid #dc3545;
+        }
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .data-item {
+            flex: 0 0 48%;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            color: #000000;  /* 黑色文字 */
+        }
+        .data-item strong {
+            color: #000000;  /* 强调文字也使用黑色 */
+        }
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .btn-custom {
+            width: 48%;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="text-center mb-4">删除待审批超欠挖计算数据</h2>
+
+    <!-- 记录详情展示 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">记录详情</h5>
+        </div>
+        <div class="card-body">
+            <div class="data-row">
+                <div class="data-item"><strong>超欠挖计算编号：</strong> {{ record.face_id }}</div>
+                <div class="data-item"><strong>施工项目编号：</strong> {{ record.project_id }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>检查日期：</strong> {{ record.inspection_date }}</div>
+                <div class="data-item"><strong>测量日期：</strong> {{ record.measurement_date }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>测量人员：</strong> {{ record.inspector }}</div>
+                <div class="data-item"><strong>线路名称：</strong> {{ record.line_name }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>北方向角：</strong> {{ record.north_direction_angle }}</div>
+                <div class="data-item"><strong>半径：</strong> {{ record.radius }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>长度：</strong> {{ record.length }}</div>
+                <div class="data-item"><strong>东坐标：</strong> {{ record.east_coordinate }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>北坐标：</strong> {{ record.north_coordinate }}</div>
+                <div class="data-item"><strong>起点偏移：</strong> {{ record.start_offset }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>高度：</strong> {{ record.height }}</div>
+                <div class="data-item"><strong>横截面半径：</strong> {{ record.radius_section }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>角度增量：</strong> {{ record.angle_increment }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提交表单 -->
+    <form method="POST">
+        {% csrf_token %}
+        <div class="btn-group">
+            <button type="submit" class="btn btn-danger btn-custom">确认删除</button>
+            <a href="{% url 'user_records_view' %}" class="btn btn-secondary btn-custom">取消</a>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

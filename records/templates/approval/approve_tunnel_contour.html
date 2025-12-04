@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>审批隧道轮廓信息</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1000px;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #343a40;
+            font-weight: bold;
+        }
+        .card {
+            border-radius: 8px;
+            box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.1);
+        }
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .data-item {
+            flex: 0 0 48%;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+        .data-item strong {
+            color: #495057;
+        }
+        .btn-approve {
+            background-color: #28a745;
+            color: #fff;
+        }
+        .btn-reject {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        textarea {
+            resize: none;
+        }
+        .bg-light-primary {
+            background-color: #b3d8ff;
+            color: #333;
+        }
+        .bg-light-success {
+            background-color: #bdeccb;
+            color: #333;
+        }
+        .bg-light-secondary {
+            background-color: #d9dee2;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="text-center mb-4">审批隧道轮廓信息</h2>
+
+    <!-- 记录详情 -->
+    <div class="card mb-4">
+        <div class="card-header bg-light-primary">
+            <h5 class="mb-0">隧道轮廓记录详情</h5>
+        </div>
+        <div class="card-body">
+            {% if is_modification %}
+                {% if record.status == 'modified_pending' %}
+                    <!-- 修改审批：只展示修改的字段 -->
+                    <h5>修改字段对比：</h5>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>字段</th>
+                            <th>原始数据</th>
+                            <th>修改后的数据</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for field, changes in modifications.items %}
+                            <tr>
+                                <td>{{ field }}</td>
+                                <td>{{ changes.old }}</td>
+{#                                <td><strong style="color: #dc3545;">{{ changes.new }}</strong></td> <!-- 高亮显示修改后的字段 -->#}
+                                <td>{{ changes.new }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% elif record.status == 'deleted_pending' %}
+                    <!-- 删除审批 -->
+                    <h5>删除记录展示：</h5>
+                    <div class="data-row">
+                        <div class="data-item"><strong>隧道编号：</strong> {{ record.face_id }}</div>
+                        <div class="data-item"><strong>施工项目编号：</strong> {{ record.project_id }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>检查日期：</strong> {{ record.inspection_date }}</div>
+                        <div class="data-item"><strong>测量人员：</strong> {{ record.inspector }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>测量日期：</strong> {{ record.measurement_date }}</div>
+                        <div class="data-item"><strong>Cr：</strong> {{ record.cr }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>w1：</strong> {{ record.w1 }}</div>
+                        <div class="data-item"><strong>w2：</strong> {{ record.w2 }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>w3：</strong> {{ record.w3 }}</div>
+                        <div class="data-item"><strong>Od：</strong> {{ record.od }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>RCL：</strong> {{ record.rcl }}</div>
+                        <div class="data-item"><strong>Vo：</strong> {{ record.vo }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>修正因子 c1：</strong> {{ record.c1 }}</div>
+                        <div class="data-item"><strong>修正因子 c2：</strong> {{ record.c2 }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>修正因子 c3：</strong> {{ record.c3 }}</div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <!-- 新增审批 -->
+                <h5>记录详情展示：</h5>
+                <div class="data-row">
+                    <div class="data-item"><strong>隧道编号：</strong> {{ record.face_id }}</div>
+                    <div class="data-item"><strong>施工项目编号：</strong> {{ record.project_id }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>检查日期：</strong> {{ record.inspection_date }}</div>
+                    <div class="data-item"><strong>测量人员：</strong> {{ record.inspector }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>测量日期：</strong> {{ record.measurement_date }}</div>
+                    <div class="data-item"><strong>Cr：</strong> {{ record.cr }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>w1：</strong> {{ record.w1 }}</div>
+                    <div class="data-item"><strong>w2：</strong> {{ record.w2 }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>w3：</strong> {{ record.w3 }}</div>
+                    <div class="data-item"><strong>Od：</strong> {{ record.od }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>RCL：</strong> {{ record.rcl }}</div>
+                    <div class="data-item"><strong>Vo：</strong> {{ record.vo }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>修正因子 c1：</strong> {{ record.c1 }}</div>
+                    <div class="data-item"><strong>修正因子 c2：</strong> {{ record.c2 }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>修正因子 c3：</strong> {{ record.c3 }}</div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 用户操作理由 -->
+    <div class="card mb-4">
+        <div class="card-header bg-light-secondary">
+            <h5 class="mb-0">用户操作理由</h5>
+        </div>
+        <div class="card-body">
+            <textarea class="form-control" rows="5" readonly>{{ record.operation_reason }}</textarea>
+        </div>
+    </div>
+
+    <!-- 审批操作 -->
+    <form method="post">
+        {% csrf_token %}
+        <div class="card mb-4">
+            <div class="card-header bg-light-success">
+                <h5 class="mb-0">审批理由</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <textarea id="approval_reason" name="approval_reason" class="form-control" rows="3" placeholder="请输入审批理由" required></textarea>
+                </div>
+                <div class="d-flex">
+                    <button type="submit" name="action" value="approve" class="btn btn-approve me-2 w-50">通过</button>
+                    <button type="submit" name="action" value="reject" class="btn btn-reject w-50">驳回</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="text-center">
+        <a href="{% url 'approval_list3' %}" class="btn btn-secondary mt-3">返回待审批列表</a>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

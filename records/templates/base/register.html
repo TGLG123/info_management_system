@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册页面</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa; /* 背景颜色 */
+            font-family: 'Arial', sans-serif; /* 更改全局字体 */
+        }
+
+        h2 {
+            color: #343a40; /* 标题颜色 */
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* 较轻的阴影效果 */
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #6c757d;
+            background-color: #f1f1f1;
+            border-top: 1px solid #e1e1e1;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 导航栏 -->
+<div class="header">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">信息管理系统</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">登录</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'register' %}">注册</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="container">
+        <!-- 消息模态框 -->
+        <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="messageModalLabel">提示信息</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="modalMessageContent"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">确定</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="text-center">用户注册</h2>
+        <form id="registerForm" method="POST">
+            {% csrf_token %}
+            <!-- 用户名 -->
+            <div class="mb-3">
+                <label for="username" class="form-label">用户名</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="请输入用户名" required>
+            </div>
+
+            <!-- 密码 -->
+            <div class="mb-3">
+                <label for="password" class="form-label">密码</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码" required>
+            </div>
+
+            <!-- 确认密码 -->
+            <div class="mb-3">
+                <label for="confirm-password" class="form-label">确认密码</label>
+                <input type="password" class="form-control" id="confirm-password" name="confirm-password" placeholder="请再次输入密码" required>
+            </div>
+
+            <!-- 邮箱 -->
+            <div class="mb-3">
+                <label for="email" class="form-label">邮箱</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="请输入邮箱" required>
+            </div>
+
+            <!-- 选择角色 -->
+            <div class="mb-3">
+                <label for="role" class="form-label">选择身份</label>
+                <select class="form-select" id="role" name="role" required>
+                    <option value="user" selected>普通用户 (User)</option>
+                    <option value="admin">管理员 (Admin)</option>
+                    <option value="auditor">审计员 (Auditor)</option>
+                </select>
+            </div>
+
+            <!-- 服务条款 -->
+            <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" id="termsCheck" required>
+                <label class="form-check-label" for="termsCheck">我同意 <a href="#">服务条款</a></label>
+            </div>
+
+            <!-- 提交按钮 -->
+            <button type="submit" class="btn btn-success w-100">注册</button>
+        </form>
+    </div>
+</div>
+
+<footer>
+    &copy; 2024 信息管理系统 - 版权所有
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 获取 Django 消息框架传递的消息
+    {% if messages %}
+        let messages = [];
+        {% for message in messages %}
+            messages.push("{{ message|escapejs }}"); // 收集所有消息
+        {% endfor %}
+
+        // 如果有消息，则显示模态框
+        if (messages.length > 0) {
+            const modalContent = document.getElementById('modalMessageContent');
+            modalContent.innerHTML = messages.join('<br>'); // 合并多条消息
+
+            // 显示模态框
+            const messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
+            messageModal.show();
+        }
+    {% endif %}
+</script>
+</body>
+</html>
+

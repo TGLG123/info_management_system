@@ -1,0 +1,244 @@
+{#管理员审批，详细的某项待审批的#}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>审批地质信息</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1000px;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #343a40;
+            font-weight: bold;
+        }
+        .card {
+            border-radius: 8px;
+            box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.1);
+        }
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .data-item {
+            flex: 0 0 48%; /* 控制每列宽度 */
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+        .data-item strong {
+            color: #495057;
+        }
+        .btn-approve {
+            background-color: #28a745;
+            color: #fff;
+        }
+        .btn-reject {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        textarea {
+            resize: none;
+        }
+
+        /*下面这三个控制记录详情，用户操作理由，审批操作的颜色*/
+        /*淡色版本*/
+        .bg-light-primary {
+            background-color: #b3d8ff;
+            color: #333;
+        }
+        .bg-light-success {
+            background-color: #bdeccb;
+            color: #333;
+        }
+        .bg-light-secondary {
+            background-color: #d9dee2;
+            color: #333;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="text-center mb-4">审批掌子面信息</h2>
+
+    <!-- 记录详情 -->
+    <div class="card mb-4">
+        <div class="card-header bg-light-primary">
+            <h5 class="mb-0">掌子面记录详情</h5>
+        </div>
+        <div class="card-body">
+            {% if is_modification %}
+                {% if record.status == 'modified_pending' %}
+                    <!-- 修改审批：只展示修改的字段 -->
+                    <h5>修改字段对比：</h5>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>字段</th>
+                            <th>原始数据</th>
+                            <th>修改后的数据</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for field, changes in modifications.items %}
+                            <tr>
+                                <td>{{ field }}</td>
+                                <td>{{ changes.old }}</td>
+{#                              <td><strong style="color: #dc3545;">{{ changes.new }}</strong></td> <!-- 高亮显示修改后的字段 -->#}
+{#                                上面那行高亮展示修改后信息，下面这行正常展示修改后信息#}
+                                <td>{{ changes.new }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% elif record.status == 'deleted_pending' %}
+                    <!-- 删除审批 -->
+                    <h5>删除记录展示：</h5>
+                    <div class="data-row">
+                        <div class="data-item"><strong>掌子面编号：</strong> {{ record.face_id }}</div>
+                        <div class="data-item"><strong>施工项目编号：</strong> {{ record.project_id }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>检查日期：</strong> {{ record.inspection_date }}</div>
+                        <div class="data-item"><strong>里程：</strong> {{ record.distance }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>设计断面：</strong> {{ record.design_section }}</div>
+                        <div class="data-item"><strong>测量人员：</strong> {{ record.inspector }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>测量日期：</strong> {{ record.measurement_date }}</div>
+                        <div class="data-item"><strong>开挖宽度：</strong> {{ record.excavation_width }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>开挖高度：</strong> {{ record.excavation_height }}</div>
+                        <div class="data-item"><strong>开挖面积：</strong> {{ record.excavation_area }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>开挖方式：</strong> {{ record.excavation_method }}</div>
+                        <div class="data-item"><strong>掌子面状态：</strong> {{ record.face_condition }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>毛开挖情况：</strong> {{ record.excavation_condition }}</div>
+                        <div class="data-item"><strong>岩石强度：</strong> {{ record.rock_strength }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>风化程度：</strong> {{ record.weathering_degree }}</div>
+                        <div class="data-item"><strong>裂缝宽度：</strong> {{ record.crack_width }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>裂缝形态：</strong> {{ record.crack_shape }}</div>
+                        <div class="data-item"><strong>渗水状态：</strong> {{ record.water_condition }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>岩爆发育程度：</strong> {{ record.rockburst_tendency }}</div>
+                        <div class="data-item"><strong>岩层级别：</strong> {{ record.rock_grade }}</div>
+                    </div>
+                    <div class="data-row">
+                        <div class="data-item"><strong>岩溶发育程度：</strong> {{ record.karst_development }}</div>
+                        <div class="data-item"><strong>消水状态：</strong> {{ record.water_status }}</div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <!-- 新增审批 -->
+                <h5>记录详情展示：</h5>
+                <div class="data-row">
+                    <div class="data-item"><strong>掌子面编号：</strong> {{ record.face_id }}</div>
+                    <div class="data-item"><strong>施工项目编号：</strong> {{ record.project_id }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>检查日期：</strong> {{ record.inspection_date }}</div>
+                    <div class="data-item"><strong>里程：</strong> {{ record.distance }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>设计断面：</strong> {{ record.design_section }}</div>
+                    <div class="data-item"><strong>测量人员：</strong> {{ record.inspector }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>测量日期：</strong> {{ record.measurement_date }}</div>
+                    <div class="data-item"><strong>开挖宽度：</strong> {{ record.excavation_width }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>开挖高度：</strong> {{ record.excavation_height }}</div>
+                    <div class="data-item"><strong>开挖面积：</strong> {{ record.excavation_area }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>开挖方式：</strong> {{ record.excavation_method }}</div>
+                    <div class="data-item"><strong>掌子面状态：</strong> {{ record.face_condition }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>毛开挖情况：</strong> {{ record.excavation_condition }}</div>
+                    <div class="data-item"><strong>岩石强度：</strong> {{ record.rock_strength }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>风化程度：</strong> {{ record.weathering_degree }}</div>
+                    <div class="data-item"><strong>裂缝宽度：</strong> {{ record.crack_width }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>裂缝形态：</strong> {{ record.crack_shape }}</div>
+                    <div class="data-item"><strong>渗水状态：</strong> {{ record.water_condition }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>岩爆发育程度：</strong> {{ record.rockburst_tendency }}</div>
+                    <div class="data-item"><strong>岩层级别：</strong> {{ record.rock_grade }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-item"><strong>岩溶发育程度：</strong> {{ record.karst_development }}</div>
+                    <div class="data-item"><strong>消水状态：</strong> {{ record.water_status }}</div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+
+
+    <!-- 用户操作理由 -->
+    <div class="card mb-4">
+        <div class="card-header bg-light-secondary">
+            <h5 class="mb-0">用户操作理由</h5>
+        </div>
+        <div class="card-body">
+            <textarea class="form-control" rows="5" readonly>{{ record.operation_reason }}</textarea>
+        </div>
+    </div>
+
+    <!-- 审批操作 -->
+    <form method="post">
+        {% csrf_token %}
+        <div class="card mb-4">
+            <div class="card-header bg-light-success">
+                <h5 class="mb-0">审批理由</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <textarea id="approval_reason" name="approval_reason" class="form-control" rows="3" placeholder="请输入审批理由" required></textarea>
+                </div>
+                <div class="d-flex">
+                    <button type="submit" name="action" value="approve" class="btn btn-approve me-2 w-50">通过</button>
+                    <button type="submit" name="action" value="reject" class="btn btn-reject w-50">驳回</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="text-center">
+        <a href="{% url 'approval_list' %}" class="btn btn-secondary mt-3">返回待审批列表</a>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

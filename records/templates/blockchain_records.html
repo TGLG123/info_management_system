@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blockchain Records</title>
+</head>
+<body>
+<h1>Blockchain Records</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>Transaction Hash</th>
+        <th>Block Number</th>
+        <th>Data</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for record in records %}
+        <tr>
+            <td><a href="https://testnet.confluxscan.io/transaction/{{ record.tx_hash }}" target="_blank">{{ record.tx_hash }}</a></td>
+            <td>{{ record.block_number }}</td>
+            <td>{{ record.data }}</td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="3">No blockchain records found.</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</body>
+</html>

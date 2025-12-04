@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地质信息列表</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #87CEEB;  /*背景颜色*/
+            color: #ffffff;   /*文字颜色*/
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            font-size: 16px; /* 增加字体大小 */
+            font-weight: bold; /* 加粗字体 */
+        }
+        .card-header .important-info {
+            flex-grow: 1; /* 拉伸信息部分 */
+            font-size: 18px; /* 增大字体 */
+            color: #ffffff; /* 保持白色字体 */
+            font-weight: bold; /* 使信息显眼 */
+            margin-right: 20px;
+        }
+        .card-header .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .card-header .action-buttons .btn {
+            font-size: 14px;
+        }
+        .card-body {
+            padding: 1.25rem;
+        }
+        .table td, .table th {
+            vertical-align: middle;
+        }
+        .form-control {
+            border-radius: 5px;
+        }
+        {#下面四个控制展开详细信息那里的颜色#}
+        .accordion-button {
+            font-size: 16px; /* 保持原有字体大小 */
+            background-color: #e7f3ff; /* 浅蓝色背景，类似图片的颜色 */
+            color: #004085; /* 深蓝色文字 */
+            border: none; /* 去掉边框 */
+            border-radius: 5px; /* 添加圆角效果 */
+            padding: 10px 15px; /* 添加内边距 */
+            text-align: left; /* 左对齐文字 */
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: #cce5ff; /* 按钮展开时的稍深浅蓝色背景 */
+            color: #003366; /* 展开时文字颜色，稍深的蓝色 */
+        }
+
+        .accordion-button:hover {
+            background-color: #d4edff; /* 鼠标悬停时的颜色，比默认浅蓝稍深 */
+            color: #002752; /* 悬停时文字颜色，稍深的蓝色 */
+        }
+
+        .accordion-button:focus {
+            box-shadow: none; /* 去掉焦点时的阴影 */
+            outline: none; /* 去掉焦点时的外轮廓 */
+        }
+        .accordion-item {
+            border: none;
+        }
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 class="text-center">掌子面信息记录</h2>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">地质信息管理</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'geological_list' %}">掌子面信息记录</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'excavation_calculation_list' %}">超欠挖计算信息记录</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'excavation_diagnosis_list' %}">超欠挖诊断信息记录</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'tunnel_contour_info_list' %}">隧道轮廓信息记录</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <form method="get" class="mb-4 d-flex">
+        <div class="input-group" style="flex-grow: 1;">
+            <input type="text" name="search" class="form-control" placeholder="请输入掌子面编号进行搜索" value="{{ search_query }}" style="border-radius: 20px 0 0 20px;">
+            <button type="submit" class="btn btn-primary" style="border-radius: 0 20px 20px 0; background-color: #6c9ecd; border: none;">搜索</button>
+        </div>
+        {% if search_query %}
+            <a href="{% url 'geological_list' %}" class="btn btn-secondary ms-2" style="border-radius: 20px; background-color: #d9534f; border: none;">取消搜索</a>
+        {% endif %}
+    </form>
+
+
+    <div class="row">
+        {% if page_obj %}
+            {% for record in page_obj %}
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div class="important-info">
+                                <div><strong>检查日期：</strong>{{ record.inspection_date }}</div>
+                                <div><strong>测量人员：</strong>{{ record.inspector }}</div>
+                            </div>
+                            <div class="action-buttons">
+                                <a href="{% url 'edit_geological_record' record.pk %}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> 修改</a>
+                                <a href="{% url 'delete_geological_record' record.pk %}" class="btn btn-danger btn-sm" onclick="return confirmDelete(this);"><i class="fas fa-trash-alt"></i> 删除</a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">基础信息</h5>
+                            <table class="table table-striped table-bordered">
+                                <tbody>
+                                <tr>
+                                    <th>里程</th>
+                                    <td>{{ record.distance }}</td>
+                                </tr>
+                                <tr>
+                                    <th>设计断面</th>
+                                    <td>{{ record.design_section }}</td>
+                                </tr>
+                                <tr>
+                                    <th>测量日期</th>
+                                    <td>{{ record.measurement_date }}</td>
+                                </tr>
+                                <tr>
+                                    <th>掌子面编号</th>
+                                    <td>{{ record.face_id }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <h5 class="card-title mt-3">详细施工信息</h5>
+                            <div class="accordion" id="accordion{{ record.pk }}">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading{{ record.pk }}">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ record.pk }}" aria-expanded="false" aria-controls="collapse{{ record.pk }}">
+                                            展开详细信息
+                                        </button>
+                                    </h2>
+                                    <div id="collapse{{ record.pk }}" class="accordion-collapse collapse" aria-labelledby="heading{{ record.pk }}" data-bs-parent="#accordion{{ record.pk }}">
+                                        <div class="accordion-body">
+                                            <table class="table table-striped table-bordered">
+                                                <tbody>
+                                                <tr>
+                                                    <th>开挖宽度</th>
+                                                    <td>{{ record.excavation_width }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>开挖高度</th>
+                                                    <td>{{ record.excavation_height }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>开挖面积</th>
+                                                    <td>{{ record.excavation_area }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>开挖方式</th>
+                                                    <td>{{ record.excavation_method }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>熔岩发育程度</th>
+                                                    <td>{{ record.karst_development }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>消水状态</th>
+                                                    <td>{{ record.water_status }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>岩石强度</th>
+                                                    <td>{{ record.rock_strength }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>风化程度</th>
+                                                    <td>{{ record.weathering_degree }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>裂缝宽度</th>
+                                                    <td>{{ record.crack_width }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>裂缝形态</th>
+                                                    <td>{{ record.crack_shape }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>掌子面状态</th>
+                                                    <td>{{ record.face_condition }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>渗水状态</th>
+                                                    <td>{{ record.water_condition }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>岩爆发育程度</th>
+                                                    <td>{{ record.rockburst_tendency }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>岩层级别</th>
+                                                    <td>{{ record.rock_grade }}</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-md-12">
+                <p class="text-center text-muted">暂无地质记录</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- 分页导航 -->
+    <nav class="mt-4">
+        <ul class="pagination">
+            <!-- 首页按钮 -->
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" aria-label="首页">
+                        首页
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">首页</span>
+                </li>
+            {% endif %}
+
+            <!-- 上一页按钮 -->
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="上一页">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;</span>
+                </li>
+            {% endif %}
+
+            <!-- 页码按钮 -->
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% elif num == 1 or num == page_obj.paginator.num_pages %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            <!-- 下一页按钮 -->
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="下一页">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;</span>
+                </li>
+            {% endif %}
+
+            <!-- 尾页按钮 -->
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="尾页">
+                        尾页
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">尾页</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+
+{#    <a href="{% url 'upload_geological_info' %}" class="btn btn-primary mt-3">上传新记录</a>#}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<div class="d-flex justify-content-center align-items-center mt-3">
+    <a href="{% url 'index' %}" class="btn btn-secondary mx-2">返回首页</a>
+    <a href="{% url 'upload_geological_info' %}" class="btn btn-primary mx-2">上传新记录</a>
+</div>
+
+
+<script>
+    function confirmDelete(element) {
+        const confirmAction = confirm("您确定要删除此记录吗？该操作无法撤销！");
+        if (confirmAction) {
+            fetch(element.href, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}' // Django CSRF Token
+                }
+            }).then(response => {
+                if (response.ok) {
+                    alert("记录已成功删除！");
+                    location.reload();
+                } else {
+                    alert("删除失败，请重试！");
+                }
+            }).catch(error => {
+                console.error("Error:", error);
+                alert("发生错误，请重试！");
+            });
+        }
+        return false;
+    }
+</script>
+
+</body>
+</html>
+

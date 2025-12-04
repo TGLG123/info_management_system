@@ -1,0 +1,237 @@
+{#掌子面修改后详细信息展示#}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>掌子面信息详情</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #0056b3;
+            border-bottom: 2px solid #e3f2fd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .table {
+            background-color: #f9fcff;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+
+        .table th {
+            background-color: #e3f2fd; /* 浅蓝色表头 */
+            color: #0056b3; /* 深蓝色文字 */
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .table td {
+            text-align: center;
+            vertical-align: middle;
+            color: #495057; /* 深灰色 */
+        }
+
+        .table tbody tr:nth-child(odd) {
+            background-color: #f7faff; /* 偶数行背景色 */
+        }
+
+        .btn-back {
+            display: block;
+            margin: 20px auto;
+            width: 200px;
+            font-size: 1rem;
+            padding: 10px 15px;
+            text-align: center;
+        }
+
+        /* 控制左右列宽占比 */
+        .table th:first-child,
+        .table td:first-child {
+            width: 40%; /* 左侧字段列占30% */
+        }
+
+        .table th:last-child,
+        .table td:last-child {
+            width: 60%; /* 右侧值列占70% */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 顶部标题 -->
+    <h2 class="text-center mb-4">掌子面信息详情</h2>
+
+    <!-- 基本信息 -->
+    <div class="section">
+        <h3 class="section-title">基本信息</h3>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>字段</th>
+                <th>值</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>掌子面编号</td>
+                <td>{{ record.face_id }}</td>
+            </tr>
+            <tr>
+                <td>施工项目编号</td>
+                <td>{{ record.project_id }}</td>
+            </tr>
+            <tr>
+                <td>检查日期</td>
+                <td>{{ record.inspection_date }}</td>
+            </tr>
+            <tr>
+                <td>测量人员</td>
+                <td>{{ record.inspector }}</td>
+            </tr>
+            <tr>
+                <td>测量日期</td>
+                <td>{{ record.measurement_date }}</td>
+            </tr>
+            <tr>
+                <td>里程</td>
+                <td>{{ record.distance }}</td>
+            </tr>
+            <tr>
+                <td>设计断面</td>
+                <td>{{ record.design_section }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 开挖信息 -->
+    <div class="section">
+        <h3 class="section-title">开挖信息</h3>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>字段</th>
+                <th>值</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>开挖宽度</td>
+                <td>{{ record.excavation_width }}</td>
+            </tr>
+            <tr>
+                <td>开挖高度</td>
+                <td>{{ record.excavation_height }}</td>
+            </tr>
+            <tr>
+                <td>开挖面积</td>
+                <td>{{ record.excavation_area }}</td>
+            </tr>
+            <tr>
+                <td>开挖方式</td>
+                <td>{{ record.excavation_method }}</td>
+            </tr>
+            <tr>
+                <td>毛开挖情况</td>
+                <td>{{ record.excavation_condition }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 岩石信息 -->
+    <div class="section">
+        <h3 class="section-title">岩石信息</h3>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>字段</th>
+                <th>值</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>岩石强度</td>
+                <td>{{ record.rock_strength }}</td>
+            </tr>
+            <tr>
+                <td>风化程度</td>
+                <td>{{ record.weathering_degree }}</td>
+            </tr>
+            <tr>
+                <td>裂缝宽度</td>
+                <td>{{ record.crack_width }}</td>
+            </tr>
+            <tr>
+                <td>裂缝形态</td>
+                <td>{{ record.crack_shape }}</td>
+            </tr>
+            <tr>
+                <td>岩层级别</td>
+                <td>{{ record.rock_grade }}</td>
+            </tr>
+            <tr>
+                <td>岩溶发育程度</td>
+                <td>{{ record.karst_development }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 状态信息 -->
+    <div class="section">
+        <h3 class="section-title">状态信息</h3>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>字段</th>
+                <th>值</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>掌子面状态</td>
+                <td>{{ record.face_condition }}</td>
+            </tr>
+            <tr>
+                <td>渗水状态</td>
+                <td>{{ record.water_condition }}</td>
+            </tr>
+            <tr>
+                <td>岩爆发育程度</td>
+                <td>{{ record.rockburst_tendency }}</td>
+            </tr>
+            <tr>
+                <td>消水状态</td>
+                <td>{{ record.water_status }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 返回按钮 -->
+    <a href="{% url 'geological_list' %}" class="btn btn-secondary btn-back">返回列表</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

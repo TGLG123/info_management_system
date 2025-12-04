@@ -1,0 +1,189 @@
+{#这是file_management_project的代码#}
+{#<!DOCTYPE html>#}
+{#<html lang="zh-CN">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>修改文件 - {{ file.file_name }}</title>#}
+{#    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">#}
+{#    <style>#}
+{#        body {#}
+{#            background-color: #f8f9fa;#}
+{#            font-family: 'Arial', sans-serif;#}
+{#        }#}
+{##}
+{#        .container {#}
+{#            max-width: 800px;#}
+{#            margin-top: 50px;#}
+{#        }#}
+{##}
+{#        footer {#}
+{#            text-align: center;#}
+{#            padding: 10px;#}
+{#            font-size: 12px;#}
+{#            color: #6c757d;#}
+{#            background-color: #f1f1f1;#}
+{#            border-top: 1px solid #e1e1e1;#}
+{#            margin-top: 40px;#}
+{#        }#}
+{#    </style>#}
+{#</head>#}
+{#<body>#}
+{##}
+{#<div class="container">#}
+{#    <h2 class="text-center mt-5">修改文件 - {{ file.file_name }}</h2>#}
+{#    <p class="text-center text-muted">请选择要上传的新文件。</p>#}
+{##}
+{#    <!-- 显示消息 -->#}
+{#    {% if messages %}#}
+{#        <div class="alert alert-info">#}
+{#            {% for message in messages %}#}
+{#                <p>{{ message }}</p>#}
+{#            {% endfor %}#}
+{#        </div>#}
+{#    {% endif %}#}
+{##}
+{#    <!-- 上传新文件表单 -->#}
+{#    <div class="card">#}
+{#        <div class="card-header">#}
+{#            <h4>上传新文件</h4>#}
+{#        </div>#}
+{#        <div class="card-body">#}
+{#            <form method="post" enctype="multipart/form-data">#}
+{#                {% csrf_token %}#}
+{#                <div class="mb-3">#}
+{#                    <label for="file" class="form-label">选择新文件</label>#}
+{#                    <input type="file" class="form-control" id="file" name="file" required>#}
+{#                </div>#}
+{#                <button type="submit" class="btn btn-primary">上传新文件</button>#}
+{#            </form>#}
+{#        </div>#}
+{#    </div>#}
+{##}
+{##}
+{#</div>#}
+{##}
+{#<div class="mt-3 text-center">#}
+{#    <!-- 返回主界面按钮 -->#}
+{#    <a href="{% url 'index' %}" class="btn btn-secondary mx-2">返回首页</a>#}
+{#    <!-- 跳转到上传页面 -->#}
+{#    <a href="{% url 'preview' %}" class="btn btn-primary mx-2">返回文件列表</a>#}
+{#</div>#}
+{##}
+{##}
+{##}
+{#<footer>#}
+{#    &copy; 2024 信息管理系统 - 版权所有#}
+{#</footer>#}
+{##}
+{#<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>#}
+{##}
+{#</body>#}
+{#</html>#}
+
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员文件修改</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #6c757d;
+            background-color: #f1f1f1;
+            border-top: 1px solid #e1e1e1;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 class="text-center mt-5">修改文件</h2>
+    <p class="text-center text-muted">请选择您需要上传的新文件，并填写相关信息。</p>
+
+    <!-- 显示消息 -->
+    {% if messages %}
+        <div class="alert alert-info">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- 修改文件表单 -->
+    <div class="card">
+        <div class="card-header">
+            <h4>修改文件</h4>
+        </div>
+        <div class="card-body">
+            <form action="{% url 'update_file' file.id %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="file" class="form-label">选择新文件</label>
+                    <input type="file" name="file" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="file_description" class="form-label">文件描述</label>
+                    <textarea class="form-control" id="file_description" name="file_description" rows="3" placeholder="请输入文件描述">{{ file.file_description }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="file_category" class="form-label">文件关联类别</label>
+                    <select class="form-select" id="file_category" name="file_category" required>
+                        <option value="" disabled>请选择文件关联类别</option>
+                        <option value="geological" {% if file.category == 'geological' %}selected{% endif %}>掌子面</option>
+                        <option value="excavation_diagnosis" {% if file.category == 'excavation_diagnosis' %}selected{% endif %}>超欠挖诊断</option>
+                        <option value="excavation_calculation" {% if file.category == 'excavation_calculation' %}selected{% endif %}>超欠挖计算</option>
+                        <option value="tunnel" {% if file.category == 'tunnel' %}selected{% endif %}>隧道</option>
+                        <option value="other" {% if file.category == 'other' %}selected{% endif %}>其他</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="related_record_id" class="form-label">关联记录编号（可选）</label>
+                    <input type="text" class="form-control" id="related_record_id" name="related_record_id" value="{{ file.related_record_id }}" placeholder="输入关联记录编号">
+                </div>
+                <div class="mb-3">
+                    <label for="operation_reason" class="form-label">操作理由</label>
+                    <textarea class="form-control" id="operation_reason" name="operation_reason" rows="3" placeholder="请输入操作理由" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">修改文件</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3 text-center">
+    <!-- 返回主界面按钮 -->
+    <a href="{% url 'index' %}" class="btn btn-secondary mx-2">返回首页</a>
+    <!-- 跳转到文件列表页面 -->
+{#    <a href="{% url 'preview' %}" class="btn btn-primary mx-2">查看文件记录</a>#}
+    <a href="{% if request.user.role == 'user' %}{% url 'preview_user' %}{% else %}{% url 'preview' %}{% endif %}" class="btn btn-primary mx-2">
+        查看文件记录
+    </a>
+</div>
+
+<footer>
+    &copy; 2025 信息管理系统 - 版权所有
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

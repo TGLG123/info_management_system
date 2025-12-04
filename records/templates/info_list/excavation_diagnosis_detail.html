@@ -1,0 +1,185 @@
+{#超欠挖诊断修改后详细信息显示#}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>超欠挖诊断信息详情</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #0056b3;
+            border-bottom: 2px solid #e3f2fd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .table {
+            background-color: #f9fcff;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+
+        .table th {
+            background-color: #e3f2fd; /* 浅蓝色表头 */
+            color: #0056b3; /* 深蓝色文字 */
+            text-align: center;
+            font-weight: bold;
+            width: 40%; /* 左列占40% */
+        }
+
+        .table td {
+            text-align: center;
+            vertical-align: middle;
+            color: #495057; /* 深灰色 */
+            width: 60%; /* 右列占60% */
+        }
+
+        .table tbody tr:nth-child(odd) {
+            background-color: #f7faff; /* 偶数行背景色 */
+        }
+
+        .btn-back {
+            display: block;
+            margin: 20px auto;
+            width: 200px;
+            font-size: 1rem;
+            padding: 10px 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 顶部标题 -->
+    <h2 class="text-center mb-4">超欠挖诊断信息详情</h2>
+
+    <!-- 基本信息 -->
+    <div class="section">
+        <h3 class="section-title">基本信息</h3>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>字段</th>
+                <th>值</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>诊断编号</td>
+                <td>{{ record.face_id }}</td>
+            </tr>
+            <tr>
+                <td>施工项目编号</td>
+                <td>{{ record.project_id }}</td>
+            </tr>
+            <tr>
+                <td>检查日期</td>
+                <td>{{ record.inspection_date }}</td>
+            </tr>
+            <tr>
+                <td>测量人员</td>
+                <td>{{ record.inspector }}</td>
+            </tr>
+            <tr>
+                <td>测量日期</td>
+                <td>{{ record.measurement_date }}</td>
+            </tr>
+            <tr>
+                <td>比例尺</td>
+                <td>{{ record.scale }}</td>
+            </tr>
+            <tr>
+                <td>里程</td>
+                <td>{{ record.mileage }}</td>
+            </tr>
+            <tr>
+                <td>设计断面</td>
+                <td>{{ record.design_section }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 超欠挖面积信息 -->
+    <div class="section">
+        <h3 class="section-title">超欠挖面积信息</h3>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>字段</th>
+                <th>值</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>超挖面积</td>
+                <td>{{ record.over_excavation_area }}</td>
+            </tr>
+            <tr>
+                <td>欠挖面积</td>
+                <td>{{ record.under_excavation_area }}</td>
+            </tr>
+            <tr>
+                <td>最大超挖</td>
+                <td>{{ record.max_over_excavation }}</td>
+            </tr>
+            <tr>
+                <td>最大欠挖</td>
+                <td>{{ record.max_under_excavation }}</td>
+            </tr>
+            <tr>
+                <td>平均超挖</td>
+                <td>{{ record.average_over_excavation }}</td>
+            </tr>
+            <tr>
+                <td>平均欠挖</td>
+                <td>{{ record.average_under_excavation }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 诊断结果 -->
+    <div class="section">
+        <h3 class="section-title">诊断结果</h3>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>字段</th>
+                <th>值</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>诊断结果</td>
+                <td>{{ record.diagnosis_result }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 返回按钮 -->
+    <a href="{% url 'excavation_diagnosis_list' %}" class="btn btn-secondary btn-back">返回列表</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隧道信息记录</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            {#background-color: #007bff;#} /*深蓝色*/
+            background-color:#87CEEB; /*浅色*/
+            color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .card-header .important-info {
+            flex-grow: 1;
+            font-size: 18px;
+            color: #ffffff;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+        .card-header .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .card-header .action-buttons .btn {
+            font-size: 14px;
+        }
+        .card-body {
+            padding: 1.25rem;
+        }
+        .table td, .table th {
+            vertical-align: middle;
+        }
+
+        {#下面四个控制展开详细信息那里的颜色#}
+        .accordion-button {
+            font-size: 16px; /* 保持原有字体大小 */
+            background-color: #e7f3ff; /* 浅蓝色背景，类似图片的颜色 */
+            color: #004085; /* 深蓝色文字 */
+            border: none; /* 去掉边框 */
+            border-radius: 5px; /* 添加圆角效果 */
+            padding: 10px 15px; /* 添加内边距 */
+            text-align: left; /* 左对齐文字 */
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: #cce5ff; /* 按钮展开时的稍深浅蓝色背景 */
+            color: #003366; /* 展开时文字颜色，稍深的蓝色 */
+        }
+
+        .accordion-button:hover {
+            background-color: #d4edff; /* 鼠标悬停时的颜色，比默认浅蓝稍深 */
+            color: #002752; /* 悬停时文字颜色，稍深的蓝色 */
+        }
+
+        .accordion-button:focus {
+            box-shadow: none; /* 去掉焦点时的阴影 */
+            outline: none; /* 去掉焦点时的外轮廓 */
+        }
+
+        .accordion-item {
+            border: none;
+        }
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <h2 class="text-center">隧道信息记录</h2>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">地质信息管理</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'geological_list' %}">掌子面信息记录</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'excavation_calculation_list' %}">超欠挖计算信息记录</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'excavation_diagnosis_list' %}">超欠挖诊断信息记录</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'tunnel_contour_info_list' %}">隧道轮廓信息记录</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <form method="get" class="mb-4 d-flex">
+        <div class="input-group" style="flex-grow: 1;">
+            <input type="text" name="search" class="form-control" placeholder="请输入隧道编号进行搜索" value="{{ search_query }}" style="border-radius: 20px 0 0 20px;">
+            <button type="submit" class="btn btn-primary" style="border-radius: 0 20px 20px 0; background-color: #6c9ecd; border: none;">搜索</button>
+        </div>
+        {% if search_query %}
+            <a href="{% url 'tunnel_contour_info_list' %}" class="btn btn-secondary ms-2" style="border-radius: 20px; background-color: #d9534f; border: none;">取消搜索</a>
+        {% endif %}
+    </form>
+
+
+    <div class="row">
+        {% if page_obj %}
+            {% for record in page_obj %}
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <!-- 重要信息部分：检查日期和测量人员 -->
+                            <div class="important-info">
+                                <div><strong>检查日期：</strong>{{ record.inspection_date }}</div>
+                                <div><strong>测量人员：</strong>{{ record.inspector }}</div>
+                            </div>
+
+                            <div class="action-buttons">
+                                <a href="{% url 'edit_tunnel_contour' record.pk %}" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i> 修改
+                                </a>
+                                <a href="{% url 'delete_tunnel_contour' record.pk %}" class="btn btn-danger btn-sm" onclick="return confirmDelete(this);">
+                                    <i class="fas fa-trash-alt"></i> 删除
+                                </a>
+                            </div>
+
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">基础信息</h5>
+                            <table class="table table-striped table-bordered">
+                                <tbody>
+                                <tr>
+                                    <th>隧道编号</th>
+                                    <td>{{ record.face_id }}</td>
+                                </tr>
+                                <tr>
+                                    <th>施工项目编号</th>
+                                    <td>{{ record.project_id }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <h5 class="card-title mt-3">详细信息</h5>
+                            <div class="accordion" id="accordion{{ record.pk }}">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading{{ record.pk }}">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ record.pk }}" aria-expanded="false" aria-controls="collapse{{ record.pk }}">
+                                            点击查看详细信息
+                                        </button>
+                                    </h2>
+                                    <div id="collapse{{ record.pk }}" class="accordion-collapse collapse" aria-labelledby="heading{{ record.pk }}" data-bs-parent="#accordion{{ record.pk }}">
+                                        <div class="accordion-body">
+                                            <table class="table table-striped table-bordered">
+                                                <tbody>
+                                                <tr>
+                                                    <th>检查日期</th>
+                                                    <td>{{ record.inspection_date }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>测量人员</th>
+                                                    <td>{{ record.inspector }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>测量日期</th>
+                                                    <td>{{ record.measurement_date }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>调整指数范围的常数 Cr</th>
+                                                    <td>{{ record.cr }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>权重值 w1</th>
+                                                    <td>{{ record.w1 }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>权重值 w2</th>
+                                                    <td>{{ record.w2 }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>权重值 w3</th>
+                                                    <td>{{ record.w3 }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>超挖深度 Od</th>
+                                                    <td>{{ record.od }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>轮廓粗糙度 RCL</th>
+                                                    <td>{{ record.rcl }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>纵向超挖变化 Vo</th>
+                                                    <td>{{ record.vo }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>修正因子 c1</th>
+                                                    <td>{{ record.c1 }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>修正因子 c2</th>
+                                                    <td>{{ record.c2 }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>修正因子 c3</th>
+                                                    <td>{{ record.c3 }}</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-md-12">
+                <p class="text-center text-muted">暂无隧道记录</p>
+            </div>
+        {% endif %}
+    </div>
+
+    {#导航兰#}
+    <nav class="mt-4">
+        <ul class="pagination">
+            <!-- 首页按钮 -->
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" aria-label="首页">首页</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">首页</span>
+                </li>
+            {% endif %}
+
+            <!-- 上一页按钮 -->
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="上一页">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;</span>
+                </li>
+            {% endif %}
+
+            <!-- 页码按钮 -->
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            <!-- 下一页按钮 -->
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="下一页">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;</span>
+                </li>
+            {% endif %}
+
+            <!-- 尾页按钮 -->
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="尾页">尾页</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">尾页</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function confirmDelete(element) {
+        if (confirm("您确定要删除此记录吗？该操作无法撤销！")) {
+            performDelete(element.href);
+        }
+        return false;
+    }
+
+    function performDelete(url) {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json',
+            },
+        }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.message || "删除失败，请重试！");
+                }
+            }).catch(error => {
+            console.error("Error:", error);
+            alert("发生错误，请重试！");
+        });
+    }
+
+</script>
+<div class="mt-3 text-center">
+    <a href="{% url 'index' %}" class="btn btn-secondary mx-2">返回首页</a>
+</div>
+
+</body>
+</html>
+
+

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件记录管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .section-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .nav-link {
+            font-weight: bold;
+            color: #333;
+        }
+        .nav-link:hover {
+            color: #007bff;
+        }
+        .active-link {
+            border-bottom: 2px solid #007bff;
+            color: #007bff !important;
+        }
+        .table thead th {
+            background-color: #cce5ff;
+            color: black;
+            text-align: center;
+        }
+        .table tbody td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 页面标题 -->
+    <h2 class="text-center mb-4">我的文件记录管理</h2>
+
+    <!-- 主导航栏 -->
+    <nav class="nav justify-content-center mb-4">
+        <a class="nav-link {% if request.resolver_match.url_name == 'user_records_view' %}active-link{% endif %}" href="{% url 'user_records_view' %}">掌子面记录</a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'excavation_calculation_records' %}active-link{% endif %}" href="{% url 'excavation_calculation_records' %}">超欠挖计算记录</a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'excavation_diagnosis_records' %}active-link{% endif %}" href="{% url 'excavation_diagnosis_records' %}">超欠挖诊断记录</a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'tunnel_contour_records' %}active-link{% endif %}" href="{% url 'tunnel_contour_records' %}">隧道轮廓记录</a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'file_records_view' %}active-link{% endif %}" href="{% url 'file_records_view' %}">文件记录</a>
+    </nav>
+
+    <!-- Tab导航栏 -->
+    <ul class="nav nav-tabs justify-content-center mb-3" id="fileTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pending-file-tab" data-bs-toggle="tab" data-bs-target="#pending-file" type="button" role="tab" aria-controls="pending-file" aria-selected="true">新增待审批文件</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="approved-file-tab" data-bs-toggle="tab" data-bs-target="#approved-file" type="button" role="tab" aria-controls="approved-file" aria-selected="false">有效文件</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="rejected-file-tab" data-bs-toggle="tab" data-bs-target="#rejected-file" type="button" role="tab" aria-controls="rejected-file" aria-selected="false">未通过审批文件</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="deleted-file-tab" data-bs-toggle="tab" data-bs-target="#deleted-file" type="button" role="tab" aria-controls="deleted-file" aria-selected="false">删除待审批文件</button>
+        </li>
+    </ul>
+
+    <!-- Tab内容 -->
+    <div class="tab-content" id="fileTabContent">
+        <!-- 新增文件 -->
+        <div class="tab-pane fade show active" id="pending-file" role="tabpanel" aria-labelledby="pending-file-tab">
+            <h3 class="section-header">新增待审批文件</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>文件名</th>
+                        <th>关联记录编号</th>
+                        <th>文件类型</th>
+                        <th>上传时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for file in pending_new_files %}
+                        <tr>
+                            <td>{{ file.id }}</td>
+                            <td>{{ file.file_name }}</td>
+                            <td>{{ file.related_record_id }}</td>
+                            <td>{{ file.data_type }}</td>
+                            <td>{{ file.created_at }}</td>
+                            <td>新增待审批</td>
+                            <td>
+                                <a href="{% url 'view_file' file.id %}" class="btn btn-primary btn-sm">查看</a>
+                                <a href="{% url 'delete_file' file.id %}" class="btn btn-danger btn-sm">删除</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">暂无新增文件记录</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- 分页 -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if pending_new_files.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_page=1" aria-label="First">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_page={{ pending_new_files.previous_page_number }}" aria-label="Previous">上一页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">首页</span></li>
+                        <li class="page-item disabled"><span class="page-link">上一页</span></li>
+                    {% endif %}
+                    {% for num in pending_new_files.paginator.page_range %}
+                        {% if pending_new_files.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?pending_page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if pending_new_files.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_page={{ pending_new_files.next_page_number }}" aria-label="Next">下一页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_page={{ pending_new_files.paginator.num_pages }}" aria-label="Last">尾页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">下一页</span></li>
+                        <li class="page-item disabled"><span class="page-link">尾页</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 有效文件 -->
+        <div class="tab-pane fade" id="approved-file" role="tabpanel" aria-labelledby="approved-file-tab">
+            <h3 class="section-header">有效文件</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>文件名</th>
+                        <th>关联记录编号</th>
+                        <th>文件类型</th>
+                        <th>文件关联类别</th>
+                        <th>上传时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for file in approved_files %}
+                        <tr>
+                            <td>{{ file.id }}</td>
+                            <td>{{ file.file_name }}</td>
+                            <td>{{ file.related_record_id }}</td>
+                            <td>{{ file.file_type }}</td>
+                            <td>{{ file.category }}</td>
+                            <td>{{ file.created_at }}</td>
+                            <td>
+                                <a href="{% url 'view_file' file.id %}" class="btn btn-primary btn-sm">查看</a>
+                                <a href="{% url 'update_file' file.id %}" class="btn btn-warning btn-sm">修改</a>
+                                <a href="{% url 'delete_file' file.id %}" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除此文件吗？');">删除</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">暂无有效文件记录</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- 分页 -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if approved_files.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?approved_page=1" aria-label="First">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?approved_page={{ approved_files.previous_page_number }}" aria-label="Previous">上一页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">首页</span></li>
+                        <li class="page-item disabled"><span class="page-link">上一页</span></li>
+                    {% endif %}
+                    {% for num in approved_files.paginator.page_range %}
+                        {% if approved_files.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?approved_page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if approved_files.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?approved_page={{ approved_files.next_page_number }}" aria-label="Next">下一页</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?approved_page={{ approved_files.paginator.num_pages}}" aria-label="Last">尾页</a>
+                    </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">下一页</span></li>
+                        <li class="page-item disabled"><span class="page-link">尾页</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 未通过文件 -->
+        <div class="tab-pane fade" id="rejected-file" role="tabpanel" aria-labelledby="rejected-file-tab">
+            <h3 class="section-header">未通过文件</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>文件名</th>
+                        <th>关联记录编号</th>
+                        <th>文件类型</th>
+                        <th>上传时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for file in rejected_files %}
+                        <tr>
+                            <td>{{ file.id }}</td>
+                            <td>{{ file.file_name }}</td>
+                            <td>{{ file.related_record_id }}</td>
+                            <td>{{ file.data_type }}</td>
+                            <td>{{ file.created_at }}</td>
+                            <td>
+                                <a href="{% url 'view_file' file.id %}" class="btn btn-primary btn-sm">查看</a>
+                                <a href="{% url 'resubmit_file' file.id %}" class="btn btn-info btn-sm">重新提交</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">暂无未通过文件记录</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- 分页 -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if rejected_files.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?rejected_page=1" aria-label="First">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?rejected_page={{ rejected_files.previous_page_number }}" aria-label="Previous">上一页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">首页</span></li>
+                        <li class="page-item disabled"><span class="page-link">上一页</span></li>
+                    {% endif %}
+                    {% for num in rejected_files.paginator.page_range %}
+                        {% if rejected_files.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?rejected_page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if rejected_files.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?rejected_page={{ rejected_files.next_page_number }}" aria-label="Next">下一页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?rejected_page={{ rejected_files.paginator.num_pages }}" aria-label="Last">尾页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">下一页</span></li>
+                        <li class="page-item disabled"><span class="page-link">尾页</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 删除待审批文件 -->
+        <div class="tab-pane fade" id="deleted-file" role="tabpanel" aria-labelledby="deleted-file-tab">
+            <h3 class="section-header">删除待审批文件</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>文件名</th>
+                        <th>关联记录编号</th>
+                        <th>文件类型</th>
+                        <th>上传时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for file in deleted_files %}
+                        <tr>
+                            <td>{{ file.id }}</td>
+                            <td>{{ file.file_name }}</td>
+                            <td>{{ file.related_record_id }}</td>
+                            <td>{{ file.data_type }}</td>
+                            <td>{{ file.created_at }}</td>
+                            <td>
+                                <a href="{% url 'view_file' file.id %}" class="btn btn-primary btn-sm">查看</a>
+                                <a href="{% url 'cancel_delete_file' file.id %}" class="btn btn-warning btn-sm">取消删除</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">暂无删除待审批文件记录</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- 分页 -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if deleted_files.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?deleted_page=1" aria-label="First">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?deleted_page={{ deleted_files.previous_page_number }}" aria-label="Previous">上一页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">首页</span></li>
+                        <li class="page-item disabled"><span class="page-link">上一页</span></li>
+                    {% endif %}
+                    {% for num in deleted_files.paginator.page_range %}
+                        {% if deleted_files.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?deleted_page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if deleted_files.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?deleted_page={{ deleted_files.next_page_number }}" aria-label="Next">下一页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?deleted_page={{ deleted_files.paginator.num_pages }}" aria-label="Last">尾页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">下一页</span></li>
+                        <li class="page-item disabled"><span class="page-link">尾页</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 检查是否有后端传递的消息
+    {% if request.session.message %}
+        let message = "{{ request.session.message|escapejs }}";
+        let messageType = "{{ request.session.message_type }}";
+
+        // 根据消息类型显示不同的弹框
+        if (messageType === "success") {
+            alert("✅ " + message);
+        } else if (messageType === "warning") {
+            alert("⚠️ " + message);
+        } else if (messageType === "error") {
+            alert("❌ " + message);
+        }
+
+        // 清除消息以防止刷新后再次显示
+        fetch("{% url 'clear_message' %}");
+    {% endif %}
+</script>
+</body>
+</html>

@@ -1,0 +1,1356 @@
+{#{% load static %}#}
+{#<!DOCTYPE html>#}
+{#<html lang="zh-CN" data-theme="light">#}
+{#<head>#}
+{#  <meta charset="UTF-8" />#}
+{#  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>#}
+{#  <title>主界面</title>#}
+{##}
+{#  <!-- 字体（可选）：更适合中文显示 -->#}
+{#  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet"/>#}
+{##}
+{#  <!-- Bootstrap & Icons -->#}
+{#  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>#}
+{#  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>#}
+{##}
+{#  <!-- Chart.js（保留原有引用） -->#}
+{#  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>#}
+{##}
+{#  <style>#}
+{#    /* ===== 主题变量（支持亮/暗主题） ===== */#}
+{#    :root {#}
+{#      --bg: #f5f7fb;#}
+{#      --card: rgba(255,255,255,0.72);#}
+{#      --text: #2c3341;#}
+{#      --muted: #6b7380;#}
+{#      --brand: #3a81c3;#}
+{#      --brand-2: #27496d;#}
+{#      --brand-3: #6cdbeb;#}
+{#      --ring: rgba(58,129,195,.35);#}
+{#      --shadow: 0 10px 30px rgba(28,36,49,.08);#}
+{#      --glass-border: 1px solid rgba(255,255,255,.35);#}
+{#      --sidebar-w: 260px;#}
+{#      --sidebar-w-collapsed: 88px;#}
+{#    }#}
+{#    [data-theme="dark"] {#}
+{#      --bg: #0f141b;#}
+{#      --card: rgba(24,28,36,0.6);#}
+{#      --text: #e6e9ef;#}
+{#      --muted: #98a2b3;#}
+{#      --brand: #6aa8e6;#}
+{#      --brand-2: #3b6b97;#}
+{#      --brand-3: #98e7f3;#}
+{#      --ring: rgba(106,168,230,.35);#}
+{#      --shadow: 0 10px 30px rgba(0,0,0,.35);#}
+{#      --glass-border: 1px solid rgba(255,255,255,.08);#}
+{#    }#}
+{##}
+{#    /* ===== 全局 ===== */#}
+{#    html, body {#}
+{#      height: 100%;#}
+{#    }#}
+{#    body {#}
+{#      font-family: "Noto Sans SC", "Arial", sans-serif;#}
+{#      background:#}
+{#        radial-gradient(1200px 600px at -10% -10%, rgba(58, 129, 195, .10), transparent 50%),#}
+{#        radial-gradient(1200px 600px at 110% 10%, rgba(39, 73, 109, .10), transparent 50%),#}
+{#        var(--bg);#}
+{#      color: var(--text);#}
+{#      margin: 0;#}
+{#      display: flex;#}
+{#      overflow: hidden;#}
+{#    }#}
+{##}
+{#    /* ===== 侧边栏 ===== */#}
+{#    .sidebar {#}
+{#      width: var(--sidebar-w);#}
+{#      height: 100vh;#}
+{#      position: fixed;#}
+{#      inset: 0 auto 0 0;#}
+{#      background: linear-gradient(160deg, var(--brand), var(--brand-2) 65%);#}
+{#      color: #fff;#}
+{#      display: flex;#}
+{#      flex-direction: column;#}
+{#      padding: 20px 14px;#}
+{#      gap: 10px;#}
+{#      transition: width .28s ease;#}
+{#      box-shadow: 6px 0 24px rgba(0,0,0,.12);#}
+{#      z-index: 10;#}
+{#    }#}
+{#    .sidebar.collapsed {#}
+{#      width: var(--sidebar-w-collapsed);#}
+{#    }#}
+{#    .sidebar-header {#}
+{#      display: flex;#}
+{#      align-items: center;#}
+{#      justify-content: space-between;#}
+{#      padding: 8px 10px;#}
+{#      margin-bottom: 8px;#}
+{#    }#}
+{#    .sidebar-title {#}
+{#      font-size: 1.25rem;#}
+{#      font-weight: 700;#}
+{#      letter-spacing: .5px;#}
+{#      text-shadow: 0 3px 10px rgba(0,0,0,.25);#}
+{#      white-space: nowrap;#}
+{#      overflow: hidden;#}
+{#      text-overflow: ellipsis;#}
+{#    }#}
+{#    .collapse-btn {#}
+{#      border: none;#}
+{#      width: 36px;#}
+{#      height: 36px;#}
+{#      border-radius: 10px;#}
+{#      background: rgba(255,255,255,.18);#}
+{#      color: #fff;#}
+{#      display: grid;#}
+{#      place-items: center;#}
+{#      transition: transform .2s ease, background .2s ease;#}
+{#    }#}
+{#    .collapse-btn:hover { background: rgba(255,255,255,.28); transform: translateY(-1px); }#}
+{##}
+{#    .nav-stack { margin-top: 6px; display: flex; flex-direction: column; gap: 6px; }#}
+{##}
+{#    .nav-item {#}
+{#      display: flex;#}
+{#      align-items: center;#}
+{#      gap: 10px;#}
+{#      padding: 10px 12px;#}
+{#      border-radius: 12px;#}
+{#      cursor: pointer;#}
+{#      transition: transform .18s ease, background .18s ease, box-shadow .18s ease;#}
+{#      position: relative;#}
+{#      will-change: transform;#}
+{#    }#}
+{#    .nav-item:hover {#}
+{#      background: rgba(255,255,255,.10);#}
+{#      transform: translateX(3px);#}
+{#      box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);#}
+{#    }#}
+{#    .nav-item i { font-size: 1rem; flex: 0 0 auto; }#}
+{#    .nav-item .nav-link { color: #fff; padding: 0; font-size: 0.96rem; white-space: nowrap; }#}
+{#    .nav-item span { font-size: 0.94rem; color: #e7efff; }#}
+{#    .sub-menu {#}
+{#      display: none;#}
+{#      flex-direction: column;#}
+{#      padding-left: 32px;#}
+{#      gap: 4px;#}
+{#      margin-top: 6px;#}
+{#    }#}
+{#    .nav-item:hover .sub-menu { display: flex; }#}
+{#    .sub-menu-item {#}
+{#      color: #e0e8ff;#}
+{#      text-decoration: none;#}
+{#      padding: 6px 8px;#}
+{#      border-radius: 8px;#}
+{#      transition: background .18s ease;#}
+{#      font-size: 0.92rem;#}
+{#    }#}
+{#    .sub-menu-item:hover { background: rgba(255,255,255,.10); color: #fff; }#}
+{##}
+{#    .sidebar.collapsed .nav-item .nav-link,#}
+{#    .sidebar.collapsed .nav-item span { opacity: 0; width: 0; visibility: hidden; }#}
+{##}
+{#    /* ===== 主内容 ===== */#}
+{#    .main-content {#}
+{#      position: relative;#}
+{#      margin-left: var(--sidebar-w);#}
+{#      width: calc(100% - var(--sidebar-w));#}
+{#      height: 100vh;#}
+{#      display: flex;#}
+{#      flex-direction: column;#}
+{#      overflow: hidden;#}
+{#      transition: margin-left .28s ease, width .28s ease;#}
+{#    }#}
+{#    .sidebar.collapsed + .main-content {#}
+{#      margin-left: var(--sidebar-w-collapsed);#}
+{#      width: calc(100% - var(--sidebar-w-collapsed));#}
+{#    }#}
+{##}
+{#    /* 顶栏 */#}
+{#    .navbar {#}
+{#      background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.75));#}
+{#      backdrop-filter: saturate(140%) blur(10px);#}
+{#      border-bottom: var(--glass-border);#}
+{#      box-shadow: var(--shadow);#}
+{#      z-index: 5;#}
+{#    }#}
+{#    .navbar-brand { color: var(--brand) !important; font-weight: 800; letter-spacing: .3px; }#}
+{#    .nav-link { color: var(--muted) !important; }#}
+{#    .nav-link.active { color: var(--brand) !important; font-weight: 700; }#}
+{##}
+{#    /* 欢迎区 */#}
+{#    .welcome-section {#}
+{#      text-align: center;#}
+{#      padding: 20px 16px 6px;#}
+{#      animation: fade-in-up .6s ease both .05s;#}
+{#    }#}
+{#    .welcome-section h1 { font-size: 1.75rem; color: var(--brand); font-weight: 800; }#}
+{#    .welcome-section p { color: var(--muted); }#}
+{##}
+{#    /* 内容滚动容器 */#}
+{#    .content-scroll {#}
+{#      flex: 1;#}
+{#      overflow: auto;#}
+{#      padding: 24px 26px 90px;#}
+{#      gap: 18px;#}
+{#      display: flex;#}
+{#      flex-direction: column;#}
+{#    }#}
+{##}
+{#    /* 统计卡组（玻璃拟态 + 动效） */#}
+{#    .status-wrap {#}
+{#      display: grid;#}
+{#      grid-template-columns: repeat(5, minmax(160px,1fr));#}
+{#      gap: 14px;#}
+{#    }#}
+{#    @media (max-width: 1200px){ .status-wrap { grid-template-columns: repeat(3,1fr); } }#}
+{#    @media (max-width: 768px){ .status-wrap { grid-template-columns: repeat(2,1fr); } }#}
+{#    @media (max-width: 520px){ .status-wrap { grid-template-columns: 1fr; } }#}
+{##}
+{#    .status-card {#}
+{#      border-radius: 18px;#}
+{#      background:#}
+{#        linear-gradient(160deg, rgba(255,255,255,.35), rgba(255,255,255,.18)),#}
+{#        radial-gradient(120% 100% at 120% -10%, rgba(108,219,235,.15), transparent 45%),#}
+{#        radial-gradient(120% 100% at -20% 110%, rgba(58,129,195,.17), transparent 45%),#}
+{#        var(--card);#}
+{#      backdrop-filter: blur(10px);#}
+{#      border: var(--glass-border);#}
+{#      box-shadow: var(--shadow);#}
+{#      padding: 18px;#}
+{#      position: relative;#}
+{#      overflow: hidden;#}
+{#      display: grid;#}
+{#      align-content: center;#}
+{#      gap: 6px;#}
+{#      transition: transform .2s ease, box-shadow .2s ease;#}
+{#      isolation: isolate;#}
+{#    }#}
+{#    .status-card::after {#}
+{#      content: "";#}
+{#      position: absolute;#}
+{#      inset: -1px -1px auto auto;#}
+{#      width: 120px; height: 120px;#}
+{#      background: radial-gradient(closest-side, var(--brand-3), transparent);#}
+{#      opacity: .15;#}
+{#      filter: blur(8px);#}
+{#      transform: translate(20px,-20px) rotate(25deg);#}
+{#      z-index: -1;#}
+{#      pointer-events: none;#}
+{#    }#}
+{#    .status-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,.10); }#}
+{#    .status-card h4 { margin: 0; font-size: 1rem; color: var(--text); font-weight: 700; }#}
+{#    .status-card .count {#}
+{#      font-size: 2rem; font-weight: 800; line-height: 1.2;#}
+{#      letter-spacing: .5px; color: var(--brand-2);#}
+{#      text-shadow: 0 2px 0 rgba(0,0,0,.02);#}
+{#    }#}
+{#    /* 骨架加载 */#}
+{#    .skeleton {#}
+{#      position: relative; overflow: hidden; border-radius: 8px; background: rgba(140,150,170,.2); height: 28px; width: 60%;#}
+{#    }#}
+{#    .skeleton::before {#}
+{#      content:""; position:absolute; inset:0;#}
+{#      background: linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent);#}
+{#      animation: shimmer 1.4s infinite;#}
+{#    }#}
+{#    @keyframes shimmer { 0% { transform: translateX(-100%);} 100% { transform: translateX(100%);} }#}
+{##}
+{#    /* 图片卡片 */#}
+{#    .card.border-0.shadow-sm {#}
+{#      background: var(--card);#}
+{#      border: var(--glass-border) !important;#}
+{#      border-radius: 18px !important;#}
+{#      box-shadow: var(--shadow) !important;#}
+{#      overflow: hidden;#}
+{#      transition: transform .22s ease, box-shadow .22s ease;#}
+{#    }#}
+{#    .card.border-0.shadow-sm:hover { transform: translateY(-4px); box-shadow: 0 18px 44px rgba(0,0,0,.12) !important; }#}
+{#    .card-img-wrap { position: relative; overflow: hidden; }#}
+{#    .card-img-top { transition: transform .35s ease; display: block; }#}
+{#    .card-img-wrap::after {#}
+{#      content: ""; position:absolute; inset:0;#}
+{#      background: radial-gradient(80% 60% at 50% 120%, rgba(0,0,0,.35), transparent 60%);#}
+{#      opacity: 0; transition: opacity .3s ease;#}
+{#    }#}
+{#    .card.border-0.shadow-sm:hover .card-img-top { transform: scale(1.06); }#}
+{#    .card.border-0.shadow-sm:hover .card-img-wrap::after { opacity: .6; }#}
+{#    .card-body { background: transparent; }#}
+{##}
+{#    .card-text { font-weight: 700; color: var(--brand); }#}
+{##}
+{#    /* 页脚 */#}
+{#    footer {#}
+{#      position: fixed;#}
+{#      bottom: 0; left: 0;#}
+{#      width: 100%;#}
+{#      background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.65));#}
+{#      backdrop-filter: blur(8px);#}
+{#      border-top: var(--glass-border);#}
+{#      text-align: center;#}
+{#      padding: 10px 0;#}
+{#      box-shadow: 0 -8px 24px rgba(0,0,0,.06);#}
+{#      color: var(--muted);#}
+{#      font-size: 14px;#}
+{#      z-index: 6;#}
+{#    }#}
+{##}
+{#    /* 进场动画与无障碍 */#}
+{#    @keyframes fade-in-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0);} }#}
+{#    .fade-in { opacity: 0; transform: translateY(10px); animation: fade-in-up .5s ease forwards; }#}
+{#    .fade-in.delay-1 { animation-delay: .06s; }#}
+{#    .fade-in.delay-2 { animation-delay: .12s; }#}
+{#    .fade-in.delay-3 { animation-delay: .18s; }#}
+{#    .fade-in.delay-4 { animation-delay: .24s; }#}
+{#    .fade-in.delay-5 { animation-delay: .30s; }#}
+{##}
+{#    @media (prefers-reduced-motion: reduce) {#}
+{#      * { animation: none !important; transition: none !important; }#}
+{#    }#}
+{#  </style>#}
+{#</head>#}
+{#<body>#}
+{#  <!-- 侧边栏 -->#}
+{#  <aside class="sidebar" id="sidebar">#}
+{#    <div class="sidebar-header">#}
+{#      <div class="sidebar-title">系统导航</div>#}
+{#      <button class="collapse-btn" id="collapseBtn" type="button" aria-label="折叠侧栏" title="折叠/展开">#}
+{#        <i class="fas fa-compress-alt"></i>#}
+{#      </button>#}
+{#    </div>#}
+{##}
+{#    {% if request.user.role == 'admin' %}#}
+{#      <nav class="nav-stack">#}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-users-cog"></i>#}
+{#          <a href="{% url 'user_management' %}" class="nav-link">用户管理</a>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-database"></i>#}
+{#          <span>数据库管理</span>#}
+{#          <div class="sub-menu">#}
+{#            <a href="{% url 'backup' %}" class="sub-menu-item">备份</a>#}
+{#            <a href="{% url 'restore_database' %}" class="sub-menu-item">恢复</a>#}
+{#          </div>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-file-upload"></i>#}
+{#          <a href="{% url 'upload_geological_info' %}" class="nav-link">上传地质信息</a>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-layer-group"></i>#}
+{#          <a href="{% url 'geological_list' %}" class="nav-link">地质信息管理</a>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-check-circle"></i>#}
+{#          <a href="{% url 'approval_list' %}" class="nav-link">审批地质信息</a>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-book"></i>#}
+{#          <a href="{% url 'user_records_view' %}" class="nav-link">我的数据记录</a>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-folder"></i>#}
+{#          <span>文件管理</span>#}
+{#          <div class="sub-menu">#}
+{#            <a href="{% url 'upload' %}" class="sub-menu-item">文件上传</a>#}
+{#            <a href="{% url 'preview' %}" class="sub-menu-item">文件预览</a>#}
+{#          </div>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-chart-line"></i>#}
+{#          <a href="{% url 'geological_statistics' %}" class="nav-link">统计报表</a>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-file-export"></i>#}
+{#          <a href="{% url 'export_geological_view' %}" class="nav-link">数据导出</a>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-sign-out-alt"></i>#}
+{#          <a href="{% url 'logout' %}" class="nav-link">退出系统</a>#}
+{#        </div>#}
+{#      </nav>#}
+{##}
+{#    {% elif request.user.role == 'user' %}#}
+{#      <nav class="nav-stack">#}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-file-upload"></i>#}
+{#          <a href="{% url 'upload_geological_info_user' %}" class="nav-link">上传地质信息</a>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-book"></i>#}
+{#          <a href="{% url 'user_records_view' %}" class="nav-link">我的数据记录</a>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-folder"></i>#}
+{#          <span>文件管理</span>#}
+{#          <div class="sub-menu">#}
+{#            <a href="{% url 'upload' %}" class="sub-menu-item">文件上传</a>#}
+{#            <a href="{% url 'preview_user' %}" class="sub-menu-item">文件预览</a>#}
+{#          </div>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-chart-line"></i>#}
+{#          <a href="{% url 'geological_statistics' %}" class="nav-link">统计报表</a>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-file-export"></i>#}
+{#          <a href="{% url 'export_geological_view' %}" class="nav-link">数据导出</a>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-sign-out-alt"></i>#}
+{#          <a href="{% url 'logout' %}" class="nav-link">退出系统</a>#}
+{#        </div>#}
+{#      </nav>#}
+{##}
+{#    {% elif request.user.role == 'auditor' %}#}
+{#      <nav class="nav-stack">#}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-database"></i>#}
+{#          <span>数据库管理</span>#}
+{#          <div class="sub-menu">#}
+{#            <a href="{% url 'backup' %}" class="sub-menu-item">备份</a>#}
+{#            <a href="{% url 'restore_database' %}" class="sub-menu-item">恢复</a>#}
+{#          </div>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-chart-bar"></i>#}
+{#          <a href="{% url 'view_audit_logs' %}" class="nav-link">审计日志</a>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-chart-line"></i>#}
+{#          <a href="{% url 'geological_statistics' %}" class="nav-link">统计报表</a>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-file-export"></i>#}
+{#          <a href="{% url 'export_geological_view' %}" class="nav-link">数据导出</a>#}
+{#        </div>#}
+{##}
+{#        <div class="nav-item">#}
+{#          <i class="fas fa-sign-out-alt"></i>#}
+{#          <a href="{% url 'logout' %}" class="nav-link">退出系统</a>#}
+{#        </div>#}
+{#      </nav>#}
+{#    {% endif %}#}
+{#  </aside>#}
+{##}
+{#  <!-- 主内容 -->#}
+{#  <main class="main-content">#}
+{#    <nav class="navbar navbar-expand-lg navbar-light">#}
+{#      <div class="container-fluid">#}
+{#        <a class="navbar-brand fw-bold" href="#" style="font-size: 1.4rem;">信息管理系统</a>#}
+{#        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"#}
+{#                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">#}
+{#          <span class="navbar-toggler-icon"></span>#}
+{#        </button>#}
+{##}
+{#        <div class="collapse navbar-collapse" id="navbarNav">#}
+{#          <ul class="navbar-nav ms-3">#}
+{#            <li class="nav-item">#}
+{#              <a class="nav-link active" aria-current="page" href="{% url 'index' %}">主界面</a>#}
+{#            </li>#}
+{#            {% if user.is_authenticated %}#}
+{#              <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">登出</a></li>#}
+{#            {% else %}#}
+{#              <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">登录</a></li>#}
+{#              <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">注册</a></li>#}
+{#            {% endif %}#}
+{#            <li class="nav-item"><a class="nav-link" href="#">关于</a></li>#}
+{#          </ul>#}
+{##}
+{#          {% if user.is_authenticated %}#}
+{#          <div class="d-flex ms-auto align-items-center gap-2">#}
+{#            <button id="themeToggle" class="btn btn-sm btn-outline-secondary" type="button" title="切换主题">#}
+{#              <i class="fas fa-moon me-1"></i><span class="d-none d-sm-inline">外观</span>#}
+{#            </button>#}
+{#            <span class="navbar-text text-secondary ms-2">#}
+{#              欢迎，<strong>{{ user.username }}</strong>#}
+{#            </span>#}
+{#            <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">退出登录</a>#}
+{#          </div>#}
+{#          {% endif %}#}
+{#        </div>#}
+{#      </div>#}
+{#    </nav>#}
+{##}
+{#    <div class="content-scroll">#}
+{#      <section class="welcome-section">#}
+{#        <h1 class="mb-1">欢迎回来，{{ user.username }}！</h1>#}
+{#        <p>祝您工作愉快，随时查看您的最新数据。</p>#}
+{#      </section>#}
+{##}
+{#      <!-- 统计卡 -->#}
+{#      <section id="status-cards" class="status-wrap">#}
+{#        <div class="status-card fade-in">#}
+{#          <h4>新增待审批</h4>#}
+{#          <div class="count" id="pending-count"><span class="skeleton"></span></div>#}
+{#        </div>#}
+{#        <div class="status-card fade-in delay-1">#}
+{#          <h4>修改待审批</h4>#}
+{#          <div class="count" id="modified-pending-count"><span class="skeleton"></span></div>#}
+{#        </div>#}
+{#        <div class="status-card fade-in delay-2">#}
+{#          <h4>删除待审批</h4>#}
+{#          <div class="count" id="deleted-pending-count"><span class="skeleton"></span></div>#}
+{#        </div>#}
+{#        <div class="status-card fade-in delay-3">#}
+{#          <h4>未通过审批</h4>#}
+{#          <div class="count" id="rejected-count"><span class="skeleton"></span></div>#}
+{#        </div>#}
+{#        <div class="status-card fade-in delay-4">#}
+{#          <h4>有效数据</h4>#}
+{#          <div class="count" id="approved-count"><span class="skeleton"></span></div>#}
+{#        </div>#}
+{#      </section>#}
+{##}
+{#      <!-- 图片区 1 -->#}
+{#      <div class="container mt-2 fade-in delay-2">#}
+{#        <div class="row g-4">#}
+{#          <div class="col-md-4">#}
+{#            <div class="card border-0 shadow-sm">#}
+{#              <div class="card-img-wrap">#}
+{#                <img src="{% static 'images/img_4.png' %}" class="card-img-top" alt="图片描述">#}
+{#              </div>#}
+{#              <div class="card-body text-center">#}
+{#                <p class="card-text">掌子面照片</p>#}
+{#              </div>#}
+{#            </div>#}
+{#          </div>#}
+{##}
+{#          <div class="col-md-4">#}
+{#            <div class="card border-0 shadow-sm">#}
+{#              <div class="card-img-wrap">#}
+{#                <img src="{% static 'images/img_5.png' %}" class="card-img-top" alt="图片描述">#}
+{#              </div>#}
+{#              <div class="card-body text-center">#}
+{#                <p class="card-text">隧道剖面照片</p>#}
+{#              </div>#}
+{#            </div>#}
+{#          </div>#}
+{##}
+{#          <div class="col-md-4">#}
+{#            <div class="card border-0 shadow-sm">#}
+{#              <div class="card-img-wrap">#}
+{#                <img src="{% static 'images/img9.png' %}" class="card-img-top" alt="图片描述">#}
+{#              </div>#}
+{#              <div class="card-body text-center">#}
+{#                <p class="card-text">统计图展示</p>#}
+{#              </div>#}
+{#            </div>#}
+{#          </div>#}
+{#        </div>#}
+{#      </div>#}
+{##}
+{#      <!-- 图片区 2 -->#}
+{#      <div class="container mt-2 fade-in delay-3">#}
+{#        <div class="row g-4">#}
+{#          <div class="col-md-4">#}
+{#            <div class="card border-0 shadow-sm">#}
+{#              <div class="card-img-wrap">#}
+{#                <img src="{% static 'images/img13.png' %}" class="card-img-top" alt="图片描述">#}
+{#              </div>#}
+{#              <div class="card-body text-center">#}
+{#                <p class="card-text">超欠挖诊断照片</p>#}
+{#              </div>#}
+{#            </div>#}
+{#          </div>#}
+{##}
+{#          <div class="col-md-4">#}
+{#            <div class="card border-0 shadow-sm">#}
+{#              <div class="card-img-wrap">#}
+{#                <img src="{% static 'images/img_3.png' %}" class="card-img-top" alt="图片描述">#}
+{#              </div>#}
+{#              <div class="card-body text-center">#}
+{#                <p class="card-text">超欠挖计算照片</p>#}
+{#              </div>#}
+{#            </div>#}
+{#          </div>#}
+{##}
+{#          <div class="col-md-4">#}
+{#            <div class="card border-0 shadow-sm">#}
+{#              <div class="card-img-wrap">#}
+{#                <img src="{% static 'images/img10.png' %}" class="card-img-top" alt="图片描述">#}
+{#              </div>#}
+{#              <div class="card-body text-center">#}
+{#                <p class="card-text">统计图展示</p>#}
+{#              </div>#}
+{#            </div>#}
+{#          </div>#}
+{#        </div>#}
+{#      </div>#}
+{##}
+{#    </div><!-- /content-scroll -->#}
+{##}
+{#    <footer>#}
+{#      © 2025  铁路隧道施工信息管理系统 - 版权所有#}
+{#    </footer>#}
+{#  </main>#}
+{##}
+{#  <!-- 依赖顺序：先 jQuery 再 Bootstrap，再自定义脚本 -->#}
+{#  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>#}
+{#  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>#}
+{##}
+{#  <script>#}
+{#    // ===== 侧栏折叠：按钮与双击均可 =====#}
+{#    const sidebar = document.getElementById('sidebar');#}
+{#    const collapseBtn = document.getElementById('collapseBtn');#}
+{#    const rootEl = document.documentElement;#}
+{##}
+{#    const toggleSidebar = () => sidebar.classList.toggle('collapsed');#}
+{#    collapseBtn.addEventListener('click', toggleSidebar);#}
+{#    sidebar.addEventListener('dblclick', toggleSidebar); // 保留你的双击折叠#}
+{##}
+{#    // ===== 亮/暗主题切换（记忆到 localStorage）=====#}
+{#    const themeToggleBtn = document.getElementById('themeToggle');#}
+{#    const savedTheme = localStorage.getItem('theme');#}
+{#    if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);#}
+{##}
+{#    function toggleTheme(){#}
+{#      const curr = document.documentElement.getAttribute('data-theme') || 'light';#}
+{#      const next = curr === 'light' ? 'dark' : 'light';#}
+{#      document.documentElement.setAttribute('data-theme', next);#}
+{#      localStorage.setItem('theme', next);#}
+{#      themeToggleBtn.innerHTML =#}
+{#        next === 'dark'#}
+{#          ? '<i class="fas fa-sun me-1"></i><span class="d-none d-sm-inline">外观</span>'#}
+{#          : '<i class="fas fa-moon me-1"></i><span class="d-none d-sm-inline">外观</span>';#}
+{#    }#}
+{#    if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);#}
+{##}
+{#    // ===== 进场观察动画（滚动时淡入）=====#}
+{#    const io = new IntersectionObserver((entries) => {#}
+{#      entries.forEach(e => {#}
+{#        if (e.isIntersecting) {#}
+{#          e.target.style.visibility = 'visible';#}
+{#          e.target.classList.add('show');#}
+{#          io.unobserve(e.target);#}
+{#        }#}
+{#      });#}
+{#    }, { threshold: 0.08 });#}
+{#    document.querySelectorAll('.fade-in').forEach(el => {#}
+{#      el.style.visibility = 'hidden';#}
+{#      io.observe(el);#}
+{#    });#}
+{##}
+{#    // ===== 数字平滑递增动画 =====#}
+{#    function animateCount(el, toValue){#}
+{#      const fromValue = Number(el.dataset.prev || 0);#}
+{#      const duration = 550; // ms#}
+{#      const start = performance.now();#}
+{#      function frame(now){#}
+{#        const p = Math.min(1, (now - start) / duration);#}
+{#        const val = Math.round(fromValue + (toValue - fromValue) * p);#}
+{#        el.textContent = val.toLocaleString();#}
+{#        if (p < 1) requestAnimationFrame(frame);#}
+{#        else el.dataset.prev = String(toValue);#}
+{#      }#}
+{#      requestAnimationFrame(frame);#}
+{#    }#}
+{##}
+{#    // ===== AJAX 数据拉取（保留你的接口与轮询逻辑）=====#}
+{#    function setSkeleton(elId, on=true){#}
+{#      const el = document.getElementById(elId);#}
+{#      if (!el) return;#}
+{#      el.innerHTML = on ? '<span class="skeleton"></span>' : '';#}
+{#    }#}
+{##}
+{#    function updateCounts(data){#}
+{#      const map = {#}
+{#        'pending-count': '新增待审批',#}
+{#        'modified-pending-count': '修改待审批',#}
+{#        'deleted-pending-count': '删除待审批',#}
+{#        'rejected-count': '未通过审批',#}
+{#        'approved-count': '有效数据'#}
+{#      };#}
+{#      Object.entries(map).forEach(([id, key]) => {#}
+{#        const el = document.getElementById(id);#}
+{#        if (!el) return;#}
+{#        const value = Number((data && data[key]) || 0);#}
+{#        animateCount(el, value);#}
+{#      });#}
+{#    }#}
+{##}
+{#    function fetchStatusCounts(){#}
+{#      // 先显示骨架#}
+{#      ['pending-count','modified-pending-count','deleted-pending-count','rejected-count','approved-count']#}
+{#        .forEach(id => setSkeleton(id, true));#}
+{#      $.ajax({#}
+{#        url: "{% url 'get_status_counts' %}",#}
+{#        method: "GET",#}
+{#        cache: false,#}
+{#        success: function(response){#}
+{#          const payload = (response && response.data) ? response.data : {};#}
+{#          updateCounts(payload);#}
+{#        },#}
+{#        error: function(xhr, status, error){#}
+{#          console.error("请求失败：", status, error, xhr.responseText);#}
+{#          // 错误时降级：用 0 替代以清空骨架#}
+{#          updateCounts({});#}
+{#        }#}
+{#      });#}
+{#    }#}
+{##}
+{#    // 首次与轮询（保持 6 秒）#}
+{#    document.addEventListener('DOMContentLoaded', function(){#}
+{#      fetchStatusCounts();#}
+{#      setInterval(fetchStatusCounts, 6000);#}
+{#    });#}
+{#  </script>#}
+{#</body>#}
+{#</html>#}
+
+
+
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主界面</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: "Arial", sans-serif;
+            background-color: #f5f6fa;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 边栏样式 */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: linear-gradient(135deg, #3a81c3, #27496d);
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: width 0.3s ease;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar-header {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #fff;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-item {
+            width: 90%;
+            padding: 10px; /* 控制每个菜单项的内边距 */
+            margin: 5px 0; /* 控制菜单项之间的间距 */
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* 左对齐内容 */
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item i {
+            margin-right: 10px; /* 图标与文字的间距 */
+            font-size: 1rem; /* 图标大小 */
+        }
+
+        .nav-item span {
+            font-size: 0.9rem; /* 调整文字大小 */
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px); /* 鼠标悬停时的动态效果 */
+        }
+
+        .sidebar.collapsed .nav-item span {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .sidebar.collapsed .nav-item i {
+            margin-right: 0;
+        }
+
+        /* 子菜单样式 */
+        .sub-menu {
+            margin: 0;
+            padding-left: 30px; /* 控制子菜单的缩进 */
+            display: none;
+            flex-direction: column;
+        }
+
+        .nav-item:hover .sub-menu {
+            display: flex; /* 鼠标悬停时显示子菜单 */
+        }
+
+        .sub-menu-item {
+            padding: 8px 0;
+            margin: 0;
+            font-size: 0.9rem; /* 保持子菜单文字大小一致 */
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center; /* 确保子菜单项的对齐方式一致 */
+        }
+
+        .sub-menu-item i {
+            margin-right: 10px;
+            font-size: 0.9rem; /* 子菜单图标大小 */
+        }
+
+        .sub-menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        /* 内容区域样式 */
+        .main-content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease, width 0.3s ease;
+            padding-left: 30px; /* 或者增加内边距 */
+            padding-right: 30px; /* 或者增加内边距 */
+        }
+
+        .sidebar.collapsed + .main-content {
+            margin-left: 80px;
+            width: calc(100% - 80px);
+        }
+
+        /* 动态效果 */
+        .nav-item:hover i {
+            color: #6cdbeb;
+        }
+
+        .nav-item:hover span {
+            color: #fff;
+        }
+
+        /* 顶部导航栏 */
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff !important;
+        }
+
+        .nav-link {
+            font-size: 1rem;
+            white-space: nowrap;
+            padding: 0.5rem 1rem;
+            color: #6c757d;
+        }
+
+        .nav-link.active {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .navbar-text {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+
+        .btn-outline-danger {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.9rem;
+        }
+    </style>
+
+    <style>
+        .welcome-section {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .welcome-section h1 {
+            font-size: 2rem;
+            color: #007bff;
+        }
+        .welcome-section p {
+            font-size: 1.2rem;
+            color: #555;
+        }
+    </style>
+
+    <style>
+        .status-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 50px;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .status-card {
+            width: 180px;
+            height: 120px;
+            background: linear-gradient(135deg, #3a81c3, #27496d);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 15px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .status-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .status-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .status-card .count {
+            font-size: 2rem;
+            font-weight: bold;
+            animation: fade-in 1s ease;
+        }
+
+        /* 数字动画 */
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+
+    </style>
+    <style>
+        .card-img-top {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card-img-top:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-body {
+            background: #f8f9fa;
+            text-align: center;
+        }
+
+        .card-text {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .container {
+            max-width: 1100px;
+        }
+    </style>
+
+</head>
+<body>
+
+<!-- 左侧边栏 -->
+<div class="sidebar" id="sidebar">
+
+    <div class="sidebar-header">系统导航</div>
+
+    {% if request.user.role == 'admin' %}
+        <!-- 管理员边栏 -->
+        <div class="nav-item">
+            <i class="fas fa-users-cog"></i>
+            <a href="{% url 'user_management' %}" class="nav-link text-white">用户管理</a>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-database"></i>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;数据库管理</span>
+            <div class="sub-menu">
+                <a href="{% url 'backup' %}" class="sub-menu-item">备份</a>
+                <a href="{% url 'restore_database' %}" class="sub-menu-item">恢复</a>
+            </div>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-file-upload"></i>
+            <a href="{% url 'upload_geological_info' %}" class="nav-link text-white">上传地质信息</a>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-layer-group"></i>
+            <a href="{% url 'geological_list' %}" class="nav-link text-white">地质信息管理</a>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-check-circle"></i>
+            <a href="{% url 'approval_list' %}" class="nav-link text-white">审批地质信息</a>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-book"></i>
+            <a href="{% url 'user_records_view' %}" class="nav-link text-white">我的数据记录</a>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-folder"></i>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;文件管理</span>
+            <div class="sub-menu">
+                <a href="{% url 'upload' %}" class="sub-menu-item">文件上传</a>
+                <a href="{% url 'preview' %}" class="sub-menu-item">文件预览</a>
+            </div>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-chart-line"></i>
+            <a href="{% url 'geological_statistics' %}" class="nav-link text-white">统计报表</a>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-file-export"></i>
+            <a href="{% url 'export_geological_view' %}" class="nav-link text-white">数据导出</a>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            <a href="{% url 'logout' %}" class="nav-link text-white">退出系统</a>
+        </div>
+
+    {% elif request.user.role == 'user' %}
+        <!-- 普通用户边栏 -->
+
+        <div class="nav-item">
+            <i class="fas fa-file-upload"></i>
+            <a href="{% url 'upload_geological_info_user' %}" class="nav-link text-white">上传地质信息</a>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-book"></i>
+            <a href="{% url 'user_records_view' %}" class="nav-link text-white">我的数据记录</a>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-folder"></i>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;文件管理</span>
+            <div class="sub-menu">
+                <a href="{% url 'upload' %}" class="sub-menu-item">文件上传</a>
+                <a href="{% url 'preview_user' %}" class="sub-menu-item">文件预览</a>
+            </div>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-chart-line"></i>
+            <a href="{% url 'geological_statistics' %}" class="nav-link text-white">统计报表</a>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-file-export"></i>
+            <a href="{% url 'export_geological_view' %}" class="nav-link text-white">数据导出</a>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            <a href="{% url 'logout' %}" class="nav-link text-white">退出系统</a>
+        </div>
+
+    {% elif request.user.role == 'auditor' %}
+        <!-- 审计员边栏 -->
+        <div class="nav-item">
+            <i class="fas fa-database"></i>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;数据库管理</span>
+            <div class="sub-menu">
+                <a href="{% url 'backup' %}" class="sub-menu-item">备份</a>
+                <a href="{% url 'restore_database' %}" class="sub-menu-item">恢复</a>
+            </div>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-chart-bar"></i>
+            <a href="{% url 'view_audit_logs' %}" class="nav-link text-white">审计日志</a>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-chart-line"></i>
+            <a href="{% url 'geological_statistics' %}" class="nav-link text-white">统计报表</a>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-file-export"></i>
+            <a href="{% url 'export_geological_view' %}" class="nav-link text-white">数据导出</a>
+        </div>
+
+        <div class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            <a href="{% url 'logout' %}" class="nav-link text-white">退出系统</a>
+        </div>
+    {% endif %}
+
+</div>
+
+
+<!-- 主内容 -->
+<div class="main-content">
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+        <div class="container-fluid">
+            <!-- 左侧标题 -->
+            <a class="navbar-brand fw-bold text-primary" href="#" style="font-size: 1.5rem;">信息管理系统</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <!-- 左侧导航菜单 -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-3">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'index' %}">主界面</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">登出</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">登录</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">注册</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">关于</a>
+                    </li>
+                </ul>
+                <!-- 用户信息和退出登录 -->
+                {% if user.is_authenticated %}
+                    <div class="d-flex ms-auto align-items-center">
+                    <span class="navbar-text me-3 text-secondary">
+                        欢迎，<strong>{{ user.username }}</strong>
+                    </span>
+                        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">退出登录</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="welcome-section">
+        <h1>欢迎回来，{{ user.username }}！</h1>
+        <p>祝您工作愉快，随时查看您的最新数据。</p>
+    </div>
+
+    <div id="status-cards" class="d-flex justify-content-between">
+        <div class="status-card">
+            <h4>新增待审批</h4>
+            <p id="pending-count">加载中...</p>
+        </div>
+        <div class="status-card">
+            <h4>修改待审批</h4>
+            <p id="modified-pending-count">加载中...</p>
+        </div>
+        <div class="status-card">
+            <h4>删除待审批</h4>
+            <p id="deleted-pending-count">加载中...</p>
+        </div>
+        <div class="status-card">
+            <h4>未通过审批</h4>
+            <p id="rejected-count">加载中...</p>
+        </div>
+        <div class="status-card">
+            <h4>有效数据</h4>
+            <p id="approved-count">加载中...</p>
+        </div>
+    </div>
+
+
+    <div class="container mt-4">
+        <div class="row g-4">
+            <!-- 图片 1 -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <img src="{% static 'images/img_4.png' %}" class="card-img-top rounded" alt="图片描述">
+                    <div class="card-body">
+                        <p class="card-text text-center">掌子面照片</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 图片 2 -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <img src="{% static 'images/img_5.png' %}" class="card-img-top rounded" alt="图片描述">
+                    <div class="card-body">
+                        <p class="card-text text-center">隧道剖面照片</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 图片 3 -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <img src="{% static 'images/img9.png' %}" class="card-img-top rounded" alt="图片描述">
+                    <div class="card-body">
+                        <p class="card-text text-center">统计图展示</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row g-4">
+            <!-- 图片 1 -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <img src="{% static 'images/img13.png' %}" class="card-img-top rounded" alt="图片描述">
+                    <div class="card-body">
+                        <p class="card-text text-center">超欠挖诊断照片</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 图片 2 -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <img src="{% static 'images/img_3.png' %}" class="card-img-top rounded" alt="图片描述">
+                    <div class="card-body">
+                        <p class="card-text text-center">超欠挖计算照片</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 图片 3 -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <img src="{% static 'images/img10.png' %}" class="card-img-top rounded" alt="图片描述">
+                    <div class="card-body">
+                        <p class="card-text text-center">统计图展示</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+<script>
+    // 边栏折叠功能
+    const sidebar = document.getElementById('sidebar');
+    sidebar.addEventListener('dblclick', () => {
+        sidebar.classList.toggle('collapsed');
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        // 动态获取统计数据
+        function fetchStatusCounts() {
+            console.log("准备发送 AJAX 请求..."); // 输出调试信息
+
+            $.ajax({
+                url: "{% url 'get_status_counts' %}",  // 确保与后端视图的 URL 名称一致
+                method: "GET",
+                beforeSend: function() {
+                    console.log("AJAX 请求即将发送...");
+                },
+                success: function(response) {
+                    console.log("成功接收到响应数据：", response); // 输出响应数据到控制台
+
+                    // 更新页面中的统计数据
+                    $('#pending-count').text(response.data['新增待审批']);
+                    $('#modified-pending-count').text(response.data['修改待审批']);
+                    $('#deleted-pending-count').text(response.data['删除待审批']);
+                    $('#rejected-count').text(response.data['未通过审批']);
+                    $('#approved-count').text(response.data['有效数据']);
+
+                    console.log("页面更新完成！"); // 确认更新完成
+                },
+                error: function(xhr, status, error) {
+                    console.error("请求失败：状态 -", status, "错误 -", error); // 输出错误信息
+                    console.error("错误响应内容：", xhr.responseText); // 输出错误响应内容
+                    alert("无法加载数据，请稍后重试。");
+                },
+                complete: function() {
+                    console.log("AJAX 请求完成，无论成功或失败。"); // 请求完成后的调试信息
+                }
+            });
+        }
+
+        // 页面加载时立即执行
+        console.log("页面加载完成，开始获取数据...");
+        fetchStatusCounts();
+
+        // 每隔一段时间刷新数据（可选）
+        setInterval(function() {
+            console.log("开始定时刷新数据...");
+            fetchStatusCounts();
+        }, 6000); // 每隔 6 秒刷新一次
+    });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<footer style="position: fixed; bottom: 0; width: 100%; background-color: #f8f9fa; text-align: center; padding: 10px 0; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); font-size: 14px; color: #6c757d;">
+    © 2025  铁路隧道施工信息管理系统 - 版权所有
+</footer>
+
+</body>
+</html>

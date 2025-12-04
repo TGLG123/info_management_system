@@ -1,0 +1,509 @@
+{#看数据库操作日志的，注意：这里不是直接检测数据库状态，而是通过 Django 的 信号机制（Signals）#}
+{#捕获 Django ORM 操作，就是直接修改数据库的看不到#}
+{##}
+{#<!DOCTYPE html>#}
+{#<html lang="zh-CN">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>审计日志记录</title>#}
+{#    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">#}
+{#    <style>#}
+{#        body {#}
+{#            background-color: #f4f6f9;#}
+{#        }#}
+{#        .container {#}
+{#            margin-top: 30px;#}
+{#        }#}
+{#        .card {#}
+{#            margin-bottom: 20px;#}
+{#            border-radius: 12px;#}
+{#            border: 1px solid #e0e0e0;#}
+{#            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);#}
+{#        }#}
+{#        .card-header {#}
+{#            background-color: #007bff;#}
+{#            color: #ffffff;#}
+{#            font-size: 18px;#}
+{#        }#}
+{#        .card-body {#}
+{#            font-size: 16px;#}
+{#            line-height: 1.6;#}
+{#        }#}
+{#        .card-title {#}
+{#            font-size: 20px;#}
+{#            font-weight: bold;#}
+{#            margin-bottom: 10px;#}
+{#        }#}
+{#        pre {#}
+{#            background-color: #f8f9fa;#}
+{#            padding: 10px;#}
+{#            border-radius: 8px;#}
+{#            border: 1px solid #ddd;#}
+{#            font-size: 14px;#}
+{#            max-height: 200px; /* 设置最大高度 */#}
+{#            overflow-y: auto; /* 启用滚动条 */#}
+{#            white-space: pre-wrap; /* 自动换行 */#}
+{#            word-wrap: break-word; /* 强制长单词换行 */#}
+{#        }#}
+{#        .btn {#}
+{#            font-size: 16px;#}
+{#            padding: 10px 20px;#}
+{#            margin-top: 20px;#}
+{#        }#}
+{#        .text-muted {#}
+{#            font-size: 14px;#}
+{#        }#}
+{#    </style>#}
+{#</head>#}
+{#<body>#}
+{#<div class="container">#}
+{#    <h2 class="text-center mb-4">审计日志记录</h2>#}
+{#    <div class="row">#}
+{#        {% if logs %}#}
+{#            {% for log in logs %}#}
+{#                <div class="col-lg-12">#}
+{#                    <div class="card">#}
+{#                        <div class="card-header">#}
+{#                            <div class="d-flex justify-content-between">#}
+{#                                <div>#}
+{#                                    操作类型：<strong>{{ log.operation_type }}</strong>#}
+{#                                </div>#}
+{#                                <div>#}
+{#                                    操作时间：<strong>{{ log.operation_time }}</strong>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                        <div class="card-body">#}
+{#                            <h5 class="card-title">日志详情</h5>#}
+{#                            <div class="mb-3">#}
+{#                                <strong>操作表：</strong>{{ log.table_name }}#}
+{#                            </div>#}
+{#                            <div class="mb-3">#}
+{#                                <strong>操作记录ID：</strong>{{ log.record_id }}#}
+{#                            </div>#}
+{#                            <div class="mb-3">#}
+{#                                <strong>操作用户：</strong>#}
+{#                                {% if log.user %}#}
+{#                                    {{ log.user.username }}#}
+{#                                {% else %}#}
+{#                                    未知#}
+{#                                {% endif %}#}
+{#                            </div>#}
+{#                            <div class="mb-3">#}
+{#                                <strong>操作原因：</strong>#}
+{#                                {% if log.operation_reason %}#}
+{#                                    {{ log.operation_reason }}#}
+{#                                {% else %}#}
+{#                                    无#}
+{#                                {% endif %}#}
+{#                            </div>#}
+{#                            <div class="mb-3">#}
+{#                                <strong>客户端IP：</strong>#}
+{#                                {% if log.client_ip %}#}
+{#                                    {{ log.client_ip }}#}
+{#                                {% else %}#}
+{#                                    未知#}
+{#                                {% endif %}#}
+{#                            </div>#}
+{#                            <div class="mb-3">#}
+{#                                <strong>操作前数据：</strong>#}
+{#                                <pre>{{ log.data_snapshot }}</pre>#}
+{#                            </div>#}
+{#                            {% if log.updated_data %}#}
+{#                                <div class="mb-3">#}
+{#                                    <strong>操作后数据：</strong>#}
+{#                                    <pre>{{ log.updated_data }}</pre>#}
+{#                                </div>#}
+{#                            {% endif %}#}
+{#                            {% if log.change_details %}#}
+{#                                <div class="mb-3">#}
+{#                                    <strong>变更详情：</strong>#}
+{#                                    <pre>{{ log.change_details }}</pre>#}
+{#                                </div>#}
+{#                            {% endif %}#}
+{#                            <div class="mb-3">#}
+{#                                <strong>批准者：</strong>#}
+{#                                {% if log.approved_by %}#}
+{#                                    {{ log.approved_by.username }}#}
+{#                                {% else %}#}
+{#                                    管理员操作，无需批准#}
+{#                                {% endif %}#}
+{#                            </div>#}
+{#                            <div class="mb-3">#}
+{#                                <strong>批准理由：</strong>#}
+{#                                {% if log.approval_reason %}#}
+{#                                    {{ log.approval_reason }}#}
+{#                                {% else %}#}
+{#                                    无#}
+{#                                {% endif %}#}
+{#                            </div>#}
+{#                            <div class="text-muted">#}
+{#                                <strong>用户代理：</strong>#}
+{#                                {% if log.user_agent %}#}
+{#                                    {{ log.user_agent }}#}
+{#                                {% else %}#}
+{#                                    未知#}
+{#                                {% endif %}#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            {% endfor %}#}
+{#        {% else %}#}
+{#            <div class="text-center">#}
+{#                <h5>暂无日志记录。</h5>#}
+{#            </div>#}
+{#        {% endif %}#}
+{#    </div>#}
+{#    <div class="text-center">#}
+{#        <a href="{% url 'index' %}" class="btn btn-secondary">返回首页</a>#}
+{#    </div>#}
+{#</div>#}
+{#<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>#}
+{#</body>#}
+{#</html>#}
+
+
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>审计日志记录</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f7fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+
+        .table {
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        .table th {
+            background-color: #6c9ecd;
+            color: white;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .table td {
+            text-align: center;
+            vertical-align: middle;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #eef3f9;
+        }
+
+        .table th:first-child,
+        .table td:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+        .table th:last-child,
+        .table td:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .btn {
+            font-size: 0.9rem;
+            padding: 5px 12px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #6c9ecd;
+            border-color: #6c9ecd;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #6c757d;
+            background-color: #f1f1f1;
+            border-top: 1px solid #e1e1e1;
+        }
+    </style>
+    <style>
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .form-select, .form-control {
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 14px;
+            padding: 8px 12px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .g-3 > div {
+            margin-bottom: 15px;
+        }
+    </style>
+
+
+</head>
+<body>
+
+<div class="container">
+    <h2 class="text-center mt-4">审计日志记录</h2>
+
+    <!-- 搜索和筛选 -->
+{#    <form method="get" class="mb-4">#}
+{#        <div class="row g-3 align-items-end">#}
+{#            <!-- 操作用户搜索框 -->#}
+{#            <div class="col-md-3">#}
+{#                <label for="user" class="form-label">操作用户</label>#}
+{#                <input type="text" id="user" name="user" class="form-control" placeholder="请输入用户名" value="{{ filters.user }}">#}
+{#            </div>#}
+{#            <!-- 操作类型筛选框 -->#}
+{#            <div class="col-md-3">#}
+{#                <label for="operation_type" class="form-label">操作类型</label>#}
+{#                <select id="operation_type" name="operation_type" class="form-select">#}
+{#                    <option value="">所有操作类型</option>#}
+{#                    {% for type in operation_types %}#}
+{#                        <option value="{{ type }}" {% if filters.operation_type == type %}selected{% endif %}>#}
+{#                            {{ type }}#}
+{#                        </option>#}
+{#                    {% endfor %}#}
+{#                </select>#}
+{#            </div>#}
+{#            <!-- 操作表筛选框 -->#}
+{#            <div class="col-md-3">#}
+{#                <label for="table_name" class="form-label">操作表</label>#}
+{#                <select id="table_name" name="table_name" class="form-select">#}
+{#                    <option value="">所有操作表</option>#}
+{#                    {% for table in table_names %}#}
+{#                        <option value="{{ table }}" {% if filters.table_name == table %}selected{% endif %}>#}
+{#                            {{ table }}#}
+{#                        </option>#}
+{#                    {% endfor %}#}
+{#                </select>#}
+{#            </div>#}
+{#            <!-- 时间范围 -->#}
+{#            <div class="col-md-3">#}
+{#                <label for="date_from" class="form-label">时间范围</label>#}
+{#                <input type="date" id="date_from" name="date_from" class="form-control mb-2" value="{{ filters.date_from }}">#}
+{#                <input type="date" id="date_to" name="date_to" class="form-control" value="{{ filters.date_to }}">#}
+{#            </div>#}
+{#        </div>#}
+{##}
+{#        <div class="text-center mt-3">#}
+{#            <button type="submit" class="btn btn-primary">筛选</button>#}
+{#            <a href="{% url 'view_audit_logs' %}" class="btn btn-secondary">清除筛选</a>#}
+{#        </div>#}
+{#    </form>#}
+
+    <!-- 搜索和筛选 -->
+    <form method="get" class="p-3" style="background-color: #e3f2fd; border-radius: 10px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);">
+        <div class="row g-3 align-items-center justify-content-center">
+            <!-- 操作用户搜索框 -->
+            <div class="col-md-2">
+                <label for="user" class="form-label">操作用户</label>
+                <input type="text" id="user" name="user" class="form-control" placeholder="请输入用户名" value="{{ filters.user }}">
+            </div>
+            <!-- 操作类型筛选框 -->
+            <div class="col-md-2">
+                <label for="operation_type" class="form-label">操作类型</label>
+                <select id="operation_type" name="operation_type" class="form-select">
+                    <option value="">所有操作类型</option>
+                    {% for type in operation_types %}
+                        <option value="{{ type }}" {% if filters.operation_type == type %}selected{% endif %}>
+                            {{ type }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- 操作表筛选框 -->
+            <div class="col-md-2">
+                <label for="table_name" class="form-label">操作表</label>
+                <select id="table_name" name="table_name" class="form-select">
+                    <option value="">所有操作表</option>
+                    {% for table in table_names %}
+                        <option value="{{ table }}" {% if filters.table_name == table %}selected{% endif %}>
+                            {{ table }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- 时间范围 -->
+            <div class="col-md-4">
+                <label for="date_from" class="form-label">时间范围</label>
+                <div class="d-flex gap-2">
+                    <input type="date" id="date_from" name="date_from" class="form-control" placeholder="开始日期" value="{{ filters.date_from }}">
+                    <input type="date" id="date_to" name="date_to" class="form-control" placeholder="结束日期" value="{{ filters.date_to }}">
+                </div>
+            </div>
+            <!-- 筛选按钮 -->
+            <div class="col-md-2 text-center">
+                <div class="d-flex justify-content-center align-items-center gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary">筛选</button>
+                    <a href="{% url 'view_audit_logs' %}" class="btn btn-secondary">清除筛选</a>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover mt-4">
+            <thead>
+            <tr>
+                <th>操作类型</th>
+                <th>操作时间</th>
+                <th>操作用户</th>
+                <th>操作表</th>
+                <th>记录ID</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for log in logs %}
+                <tr>
+                    <td>{{ log.operation_type }}</td>
+                    <td>{{ log.operation_time|date:"Y-m-d H:i" }}</td>
+                    <td>{{ log.user.username|default:"未知" }}</td>
+                    <td>{{ log.table_name }}</td>
+                    <td>{{ log.record_id }}</td>
+                    <td>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="{% url 'view_log_detail' log.id %}" class="btn btn-primary btn-sm">查看详情</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">暂无日志记录</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 分页控件 -->
+{#    <nav aria-label="分页">#}
+{#        <ul class="pagination justify-content-center mt-4">#}
+{#            {% if logs.has_previous %}#}
+{#                <!-- 首页按钮 -->#}
+{#                <li class="page-item">#}
+{#                    <a class="page-link" href="?page=1" aria-label="首页">首页</a>#}
+{#                </li>#}
+{#                <!-- 上一页按钮 -->#}
+{#                <li class="page-item">#}
+{#                    <a class="page-link" href="?page={{ logs.previous_page_number }}" aria-label="上一页">&laquo;</a>#}
+{#                </li>#}
+{#            {% endif %}#}
+{#            <!-- 当前页附近的页码 -->#}
+{#            {% for num in logs.paginator.page_range %}#}
+{#                {% if num >= logs.number|add:-2 and num <= logs.number|add:2 %}#}
+{#                    <li class="page-item {% if num == logs.number %}active{% endif %}">#}
+{#                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>#}
+{#                    </li>#}
+{#                {% endif %}#}
+{#            {% endfor %}#}
+{#            {% if logs.has_next %}#}
+{#                <!-- 下一页按钮 -->#}
+{#                <li class="page-item">#}
+{#                    <a class="page-link" href="?page={{ logs.next_page_number }}">下一页 &raquo;</a>#}
+{#                </li>#}
+{#                <!-- 尾页按钮 -->#}
+{#                <li class="page-item">#}
+{#                    <a class="page-link" href="?page={{ logs.paginator.num_pages }}">尾页</a>#}
+{#                </li>#}
+{#            {% endif %}#}
+{#        </ul>#}
+{#    </nav>#}
+
+    <!-- 分页控件 -->
+    <nav aria-label="分页">
+        <ul class="pagination justify-content-center mt-4">
+            {% if logs.has_previous %}
+                <!-- 首页按钮 -->
+                <li class="page-item">
+                    <a class="page-link" href="?page=1&{{ query_params }}" aria-label="首页">首页</a>
+                </li>
+                <!-- 上一页按钮 -->
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ logs.previous_page_number }}&{{ query_params }}" aria-label="上一页">&laquo;</a>
+                </li>
+            {% endif %}
+            <!-- 当前页附近的页码 -->
+            {% for num in logs.paginator.page_range %}
+                {% if num >= logs.number|add:-2 and num <= logs.number|add:2 %}
+                    <li class="page-item {% if num == logs.number %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}&{{ query_params }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            {% if logs.has_next %}
+                <!-- 下一页按钮 -->
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ logs.next_page_number }}&{{ query_params }}">下一页 &raquo;</a>
+                </li>
+                <!-- 尾页按钮 -->
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ logs.paginator.num_pages }}&{{ query_params }}">尾页</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+
+</div>
+
+<div class="text-center mb-4">
+    <a href="{% url 'index' %}" class="btn btn-secondary mx-2">返回首页</a>
+</div>
+
+<footer>
+    &copy; 2025 系统管理 - 版权所有
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
+
+

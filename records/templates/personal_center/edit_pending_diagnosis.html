@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修改待审批数据</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* 页面整体样式 */
+        body {
+            background-color: #eef2f7; /* 柔和的浅灰蓝色背景 */
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px; /* 圆角边框 */
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+        }
+        .section-title {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            color: #007bff; /* 蓝色标题 */
+            margin-bottom: 30px;
+        }
+        .form-table {
+            width: 100%;
+            table-layout: fixed; /* 固定列宽，确保两边长度一致 */
+        }
+        .form-table td {
+            padding: 15px; /* 单元格间距 */
+            vertical-align: middle;
+        }
+        .form-table input, .form-table select, .form-table textarea {
+            width: 100%; /* 填满单元格 */
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ced4da; /* 灰色边框 */
+            border-radius: 5px; /* 圆角输入框 */
+            box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1); /* 内部阴影 */
+            transition: all 0.2s ease; /* 聚焦动画 */
+        }
+        .form-table input:focus, .form-table select:focus, .form-table textarea:focus {
+            border-color: #007bff; /* 聚焦边框颜色 */
+            box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5); /* 聚焦外部光晕 */
+        }
+        .form-label {
+            font-weight: bold;
+            color: #495057; /* 深灰色字体 */
+            display: block;
+            margin-bottom: 5px; /* 标签与输入框之间的间距 */
+        }
+        .text-danger {
+            font-size: 12px;
+        }
+        .btn-custom {
+            width: 100%; /* 按钮宽度填满 */
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 顶部标题 -->
+    <h2 class="section-title">修改待审批超欠挖诊断数据</h2>
+    <form method="post">
+        {% csrf_token %}
+        <!-- 表单内容 -->
+        <table class="table form-table">
+            <tbody>
+            {% for field in form %}
+                {% if field.name == "operation_reason" %}
+                    <!-- 单独处理操作理由字段，放在新行 -->
+                    <tr>
+                        <td colspan="2"> <!-- 占据整行 -->
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            <textarea id="{{ field.id_for_label }}" name="{{ field.html_name }}" style="height: 100px; width: 100%; resize: vertical;">{{ field.value }}</textarea>
+                            {% if field.errors %}
+                                <div class="text-danger small">{{ field.errors }}</div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    {% if forloop.counter0|divisibleby:2 %} <!-- 每两项开始一个新行 -->
+                        <tr>
+                    {% endif %}
+                <td>
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="text-danger small">{{ field.errors }}</div>
+                    {% endif %}
+                </td>
+                {% if forloop.counter|divisibleby:2 or forloop.last %} <!-- 每两项结束一个行 -->
+                    </tr>
+                {% endif %}
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <!-- 按钮区 -->
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary btn-lg btn-custom">保存修改</button>
+            <a href="{% url 'user_records_view' %}" class="btn btn-secondary btn-lg btn-custom mt-3">返回</a>
+        </div>
+    </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

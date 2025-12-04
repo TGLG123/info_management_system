@@ -1,0 +1,67 @@
+{#用户修改自己的“修改待审批”信息#}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修改待审批记录</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 900px;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #343a40;
+            font-weight: bold;
+        }
+        .btn-primary {
+            width: 100%;
+            font-size: 16px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="text-center mb-4">修改待审批记录</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% if errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for field, error in errors.items %}
+                        <li>{{ field }}: {{ error|join:", " }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <div class="row">
+            <!-- 表单字段 -->
+            {% for field in form %}
+                <div class="col-md-6 mb-3">
+                    {{ field.label_tag }}
+                    {{ field }}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            <label for="operation_reason" class="form-label">操作理由</label>
+            <textarea id="operation_reason" name="operation_reason" class="form-control" rows="3" placeholder="请输入操作理由" required>{{ record.operation_reason }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">保存修改</button>
+    </form>
+    <div class="mt-3 text-center">
+        <a href="{% url 'user_records_view' %}" class="btn btn-secondary mx-2">返回记录管理</a>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>申请修改超欠挖计算数据</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 900px;
+            margin-top: 50px;
+        }
+        .btn-custom {
+            width: 100%;
+        }
+        .card {
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            color: #007bff;
+            font-weight: bold;
+            text-align: center;
+            font-size: 2rem;
+        }
+        .card-body {
+            padding: 30px;
+            background-color: #fff;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        .form-control {
+            border-radius: 5px;
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+        }
+        .row .col-md-6 {
+            margin-bottom: 15px;
+        }
+        .text-center {
+            margin-top: 30px;
+        }
+    </style>
+    <style>
+        .error-popup {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff4d4f;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<div id="error-popup" class="error-popup"></div>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            申请修改超欠挖计算数据
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="inspection_date" class="form-label">检查日期</label>
+                            <input type="date" class="form-control" id="inspection_date" name="inspection_date" value="{{ record.inspection_date }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="inspector" class="form-label">测量人员</label>
+                            <input type="text" class="form-control" id="inspector" name="inspector" placeholder="请输入测量人员" value="{{ record.inspector }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="measurement_date" class="form-label">测量日期</label>
+                            <input type="date" class="form-control" id="measurement_date" name="measurement_date" value="{{ record.measurement_date }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="line_name" class="form-label">线路名称</label>
+                            <input type="text" class="form-control" id="line_name" name="line_name" placeholder="请输入线路名称" value="{{ record.line_name }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="north_direction_angle" class="form-label">北方向角</label>
+                            <input type="number" class="form-control" id="north_direction_angle" name="north_direction_angle" placeholder="请输入北方向角" value="{{ record.north_direction_angle }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="radius" class="form-label">半径</label>
+                            <input type="number" class="form-control" id="radius" name="radius" placeholder="请输入半径" value="{{ record.radius }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="length" class="form-label">长度</label>
+                            <input type="number" class="form-control" id="length" name="length" placeholder="请输入长度" value="{{ record.length }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="east_coordinate" class="form-label">东坐标</label>
+                            <input type="number" class="form-control" id="east_coordinate" name="east_coordinate" placeholder="请输入东坐标" value="{{ record.east_coordinate }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="north_coordinate" class="form-label">北坐标</label>
+                            <input type="number" class="form-control" id="north_coordinate" name="north_coordinate" placeholder="请输入北坐标" value="{{ record.north_coordinate }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="start_offset" class="form-label">起点偏移</label>
+                            <input type="number" class="form-control" id="start_offset" name="start_offset" placeholder="请输入起点偏移" value="{{ record.start_offset }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="height" class="form-label">高度</label>
+                            <input type="number" class="form-control" id="height" name="height" placeholder="请输入高度" value="{{ record.height }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="radius_section" class="form-label">横截面半径</label>
+                            <input type="number" class="form-control" id="radius_section" name="radius_section" placeholder="请输入横截面半径" value="{{ record.radius_section }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="angle_increment" class="form-label">角度增量</label>
+                            <input type="number" class="form-control" id="angle_increment" name="angle_increment" placeholder="请输入角度增量" value="{{ record.angle_increment }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="face_id" class="form-label">超欠挖计算编号</label>
+                            <input type="text" class="form-control" id="face_id" name="face_id" placeholder="请输入超欠挖计算编号" value="{{ record.face_id }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="project_id" class="form-label">施工项目编号</label>
+                            <input type="text" class="form-control" id="project_id" name="project_id" placeholder="请输入施工项目编号" value="{{ record.project_id }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="operation_reason" class="form-label">操作理由</label>
+                            <textarea class="form-control" id="operation_reason" name="operation_reason" placeholder="请输入操作理由" rows="3">{{ record.operation_reason }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-info btn-custom">提交修改申请</button>
+                    <a href="{% url 'user_records_view' %}" class="btn btn-secondary btn-custom mt-2">取消修改</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.querySelector("form").addEventListener("submit", function (event) {
+        event.preventDefault(); // 阻止表单提交
+
+        const requiredFields = [
+            { id: "inspection_date", name: "检查日期" },
+            { id: "inspector", name: "测量人员" },
+            { id: "measurement_date", name: "测量日期" },
+            { id: "line_name", name: "线路名称" },
+            { id: "north_direction_angle", name: "北方向角" },
+            { id: "radius", name: "半径" },
+            { id: "length", name: "长度" },
+            { id: "east_coordinate", name: "东坐标" },
+            { id: "north_coordinate", name: "北坐标" },
+            { id: "start_offset", name: "起点偏移" },
+            { id: "height", name: "高度" },
+            { id: "radius_section", name: "横截面半径" },
+            { id: "angle_increment", name: "角度增量" },
+            { id: "face_id", name: "超欠挖计算编号" },
+            { id: "project_id", name: "施工项目编号" },
+            { id: "operation_reason", name: "操作理由" },
+        ];
+
+        let missingFields = [];
+
+        requiredFields.forEach(function (field) {
+            const input = document.getElementById(field.id);
+            if (!input || input.value.trim() === "") {
+                missingFields.push(field.name);
+            }
+        });
+
+        if (missingFields.length > 0) {
+            showErrorPopup("请填写以下字段：" + missingFields.join(", "));
+        } else {
+            event.target.submit(); // 提交表单
+        }
+    });
+
+    function showErrorPopup(message) {
+        const popup = document.getElementById("error-popup");
+        popup.innerText = message;
+        popup.style.display = "block";
+
+        setTimeout(function () {
+            popup.style.display = "none";
+        }, 3000); // 3秒后自动隐藏
+    }
+</script>
+
+</body>
+</html>

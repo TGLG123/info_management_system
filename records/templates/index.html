@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主界面</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin-top: 50px;
+        }
+
+        .card {
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #6c757d;
+            background-color: #f1f1f1;
+            border-top: 1px solid #e1e1e1;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">信息管理系统</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{% url 'index' %}">主界面</a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">登出</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">登录</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">注册</a>
+                    </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="#">关于</a>
+                </li>
+            </ul>
+            {% if user.is_authenticated %}
+                <span class="navbar-text">
+                    欢迎，{{ user.username }}
+                    <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm ms-2">退出登录</a>
+                </span>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<!-- 主内容 -->
+<div class="container">
+    {% if user.is_authenticated %}
+        <h1 class="text-center">欢迎来到信息管理系统</h1>
+        <p class="text-center text-muted">这是一个用户友好的信息管理平台，您可以在这里管理数据、查看报告以及完成其他操作。</p>
+
+        <!-- 分类：用户管理模块 -->
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">用户管理</h5>
+                        <p class="card-text">查看和管理用户信息。</p>
+                        <a href="{% url 'user_management' %}" class="btn btn-primary">进入</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">文件列表用户</h5>
+                        <p class="card-text">文件列表用户。</p>
+                        <a href="{% url 'preview_user' %}" class="btn btn-primary">进入</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">数据库备份</h5>
+                        <p class="card-text">数据库备份。</p>
+                        <a href="{% url 'backup' %}" class="btn btn-primary">进入</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">数据库恢复</h5>
+                        <p class="card-text">数据库恢复。</p>
+                        <a href="{% url 'restore_database' %}" class="btn btn-primary">进入</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分类：地质信息模块 -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">用户上传地质信息</h5>
+                        <p class="card-text">测试用户上传地质信息功能。</p>
+                        <a href="{% url 'upload_geological_info_user' %}" class="btn btn-primary">进入</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">管理员上传地质信息</h5>
+                        <p class="card-text">测试管理员上传地质信息功能。</p>
+                        <a href="{% url 'upload_geological_info' %}" class="btn btn-primary">进入</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">地质信息管理</h5>
+                        <p class="card-text">查看和管理所有上传的地质信息。</p>
+                        <a href="{% url 'geological_list' %}" class="btn btn-primary">进入</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分类：审批与审计模块 -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">审批列表</h5>
+                        <p class="card-text">查看待审批的记录列表。</p>
+                        <a href="{% url 'approval_list' %}" class="btn btn-primary">进入</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">查看审计日志</h5>
+                        <p class="card-text">查看系统操作日志和审计信息。</p>
+                        <a href="{% url 'view_audit_logs' %}" class="btn btn-primary">进入</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分类：用户记录管理模块 -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">我的数据记录</h5>
+                        <p class="card-text">查看和管理您上传的所有数据。</p>
+                        <a href="{% url 'user_records_view' %}" class="btn btn-primary">查看记录</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分类：文件管理模块 -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">文件上传</h5>
+                        <p class="card-text">上传文件到系统中进行管理。</p>
+                        <a href="{% url 'upload' %}" class="btn btn-success">上传文件</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">文件预览</h5>
+                        <p class="card-text">查看上传文件的详细信息。</p>
+                        <a href="{% url 'preview' %}" class="btn btn-info">预览文件</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分类：统计与帮助模块 -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">统计报表</h5>
+                        <p class="card-text">查看数据的统计和分析结果。</p>
+                        <a href="{% url 'geological_statistics' %}" class="btn btn-primary">进入</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">数据导出</h5>
+                        <p class="card-text">导出数据为excel</p>
+                        <a href="{% url 'export_geological_view' %}" class="btn btn-primary">进入</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <h1 class="text-center">欢迎访问信息管理系统</h1>
+        <p class="text-center text-muted">请先登录以访问更多功能。</p>
+        <div class="text-center">
+            <a href="{% url 'login' %}" class="btn btn-success">登录</a>
+            <a href="{% url 'register' %}" class="btn btn-primary">注册</a>
+        </div>
+    {% endif %}
+</div>
+
+
+<footer>
+    &copy; 2024 信息管理系统 - 版权所有
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+{#{% load static %}#}
+{#<!DOCTYPE html>#}
+{#<html lang="zh-CN">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>主界面</title>#}
+{#    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">#}
+{#    <style>#}
+{#        body {#}
+{#            background-color: #f8f9fa;#}
+{#            font-family: 'Arial', sans-serif;#}
+{#        }#}
+{##}
+{#        .container {#}
+{#            max-width: 1000px;#}
+{#            margin-top: 50px;#}
+{#        }#}
+{##}
+{#        .card {#}
+{#            transition: transform 0.2s ease;#}
+{#        }#}
+{##}
+{#        .card:hover {#}
+{#            transform: scale(1.05);#}
+{#        }#}
+{##}
+{#        footer {#}
+{#            text-align: center;#}
+{#            padding: 10px;#}
+{#            font-size: 12px;#}
+{#            color: #6c757d;#}
+{#            background-color: #f1f1f1;#}
+{#            border-top: 1px solid #e1e1e1;#}
+{#            margin-top: 40px;#}
+{#        }#}
+{##}
+{##}
+{##}
+{#        /* 美化顶部文字 */#}
+{#        .hero-section {#}
+{#            padding: 10px 0;#}
+{#            padding: 5px 0; /* 减少上下内边距，让内容更靠近顶部 */#}
+{#            margin-top: -20px; /* 负值让整个区域向上移动 */#}
+{#            background-color: #f8f9fa;#}
+{#            border-bottom: 2px solid #e9ecef;#}
+{#        }#}
+{##}
+{#        .hero-title {#}
+{#            font-weight: bold;#}
+{#            font-size: 2.5rem;#}
+{#            letter-spacing: 1px;#}
+{#            text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1);#}
+{#        }#}
+{##}
+{#        .hero-subtitle {#}
+{#            font-size: 1.2rem;#}
+{#            margin-top: 10px;#}
+{#        }#}
+{##}
+{#        /* 控制轮播图大小和留白 */#}
+{#        .carousel-container {#}
+{#            margin: 20px auto;#}
+{#            max-width: 90%;#}
+{#            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);#}
+{#            border-radius: 10px;#}
+{#            overflow: hidden;#}
+{#        }#}
+{##}
+{#        /* 图片样式 */#}
+{#        .carousel-inner img {#}
+{#            object-fit: cover;#}
+{#            width: 100%;#}
+{#            height: 800px;#}
+{#        }#}
+{##}
+{#        /* 按钮样式 */#}
+{#        .carousel-control-prev-icon,#}
+{#        .carousel-control-next-icon {#}
+{#            background-color: rgba(0, 0, 0, 0.6);#}
+{#            border-radius: 50%;#}
+{#            width: 40px;#}
+{#            height: 40px;#}
+{#        }#}
+{#        .carousel-control-prev-icon:hover,#}
+{#        .carousel-control-next-icon:hover {#}
+{#            background-color: rgba(0, 0, 0, 0.8);#}
+{#        }#}
+{##}
+{##}
+{#        /* 左侧边栏样式 */#}
+{#        .sidebar {#}
+{#            position: fixed;#}
+{#            top: 0;#}
+{#            left: 0;#}
+{#            height: 100vh;#}
+{#            width: 250px;#}
+{#            background-color: #343a40;#}
+{#            color: #fff;#}
+{#            padding-top: 20px;#}
+{#        }#}
+{##}
+{#        .sidebar h4 {#}
+{#            text-align: center;#}
+{#            color: #fff;#}
+{#            margin-bottom: 20px;#}
+{#        }#}
+{##}
+{#        .sidebar .nav-link {#}
+{#            color: #adb5bd;#}
+{#            padding: 10px 20px;#}
+{#            border-radius: 4px;#}
+{#        }#}
+{##}
+{#        .sidebar .nav-link:hover,#}
+{#        .sidebar .nav-link.active {#}
+{#            background-color: #495057;#}
+{#            color: #fff;#}
+{#        }#}
+{##}
+{#    </style>#}
+{#</head>#}
+{#<body>#}
+{##}
+{#<!-- 导航栏 -->#}
+{#<nav class="navbar navbar-expand-lg navbar-light bg-light">#}
+{#    <div class="container-fluid">#}
+{#        <a class="navbar-brand" href="#">信息管理系统</a>#}
+{#        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">#}
+{#            <span class="navbar-toggler-icon"></span>#}
+{#        </button>#}
+{#        <div class="collapse navbar-collapse" id="navbarNav">#}
+{#            <ul class="navbar-nav me-auto mb-2 mb-lg-0">#}
+{#                <li class="nav-item">#}
+{#                    <a class="nav-link active" aria-current="page" href="{% url 'index' %}">主界面</a>#}
+{#                </li>#}
+{#                {% if user.is_authenticated %}#}
+{#                    <li class="nav-item">#}
+{#                        <a class="nav-link" href="{% url 'logout' %}">登出</a>#}
+{#                    </li>#}
+{#                {% else %}#}
+{#                    <li class="nav-item">#}
+{#                        <a class="nav-link" href="{% url 'login' %}">登录</a>#}
+{#                    </li>#}
+{#                    <li class="nav-item">#}
+{#                        <a class="nav-link" href="{% url 'register' %}">注册</a>#}
+{#                    </li>#}
+{#                {% endif %}#}
+{#                <li class="nav-item">#}
+{#                    <a class="nav-link" href="#">关于</a>#}
+{#                </li>#}
+{#            </ul>#}
+{#            {% if user.is_authenticated %}#}
+{#                <span class="navbar-text">#}
+{#                    欢迎，{{ user.username }}#}
+{#                    <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm ms-2">退出登录</a>#}
+{#                </span>#}
+{#            {% endif %}#}
+{#        </div>#}
+{#    </div>#}
+{#</nav>#}
+{##}
+{##}
+{##}
+{#<div class="hero-section">#}
+{#    <div class="container text-center">#}
+{#        <h1 class="display-4 text-primary hero-title">欢迎使用铁路施工信息管理系统</h1>#}
+{#        <p class="lead text-secondary hero-subtitle">一站式管理您的地质信息、统计报表和数据导出</p>#}
+{#    </div>#}
+{#</div>#}
+{##}
+{#<div class="carousel-container">#}
+{#    <div id="carouselExampleIndicators" class="carousel slide mt-4" data-bs-ride="carousel">#}
+{#        <div class="carousel-indicators">#}
+{#            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>#}
+{#            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>#}
+{#            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>#}
+{#        </div>#}
+{#        <div class="carousel-inner">#}
+{#            <div class="carousel-item active">#}
+{#                <img src="{% static 'images/img.png' %}" alt="图片1">#}
+{#            </div>#}
+{#            <div class="carousel-item">#}
+{#                <img src="{% static 'images/img_1.png' %}" alt="图片2">#}
+{#            </div>#}
+{#            <div class="carousel-item">#}
+{#                <img src="{% static 'images/img_5.png' %}" alt="图片3">#}
+{#            </div>#}
+{#        </div>#}
+{#        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">#}
+{#            <span class="carousel-control-prev-icon" aria-hidden="true"></span>#}
+{#            <span class="visually-hidden">Previous</span>#}
+{#        </button>#}
+{#        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">#}
+{#            <span class="carousel-control-next-icon" aria-hidden="true"></span>#}
+{#            <span class="visually-hidden">Next</span>#}
+{#        </button>#}
+{#    </div>#}
+{#</div>#}
+{##}
+{##}
+{##}
+{#<!-- 主内容 -->#}
+{#<div class="container">#}
+{#    {% if user.is_authenticated %}#}
+{#        {% if user.role == "admin" %}#}
+{#            <!-- 管理员模块 -->#}
+{#            <div class="container mt-5">#}
+{#                <div class="row">#}
+{#                    <!-- 用户管理 -->#}
+{#                    <div class="col-md-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">用户管理</h5>#}
+{#                                <p class="card-text">查看和管理用户信息。</p>#}
+{#                                <a href="{% url 'user_management' %}" class="btn btn-primary">进入</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <!-- 管理员上传地质信息 -->#}
+{#                    <div class="col-md-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">管理员上传地质信息</h5>#}
+{#                                <p class="card-text">上传地质信息并管理。</p>#}
+{#                                <a href="{% url 'upload_geological_info' %}" class="btn btn-primary">进入</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <!-- 地质信息管理 -->#}
+{#                    <div class="col-md-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">地质信息管理</h5>#}
+{#                                <p class="card-text">查看和管理所有上传的地质信息。</p>#}
+{#                                <a href="{% url 'geological_list' %}" class="btn btn-primary">进入</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <!-- 审批列表 -->#}
+{#                    <div class="col-md-4 mt-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">审批列表</h5>#}
+{#                                <p class="card-text">查看待审批的记录列表。</p>#}
+{#                                <a href="{% url 'approval_list' %}" class="btn btn-primary">进入</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <!-- 我的数据记录 -->#}
+{#                    <div class="col-md-4 mt-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">我的数据记录</h5>#}
+{#                                <p class="card-text">查看和管理上传的所有数据。</p>#}
+{#                                <a href="{% url 'user_records_view' %}" class="btn btn-primary">查看记录</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <!-- 统计报表 -->#}
+{#                    <div class="col-md-4 mt-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">统计报表</h5>#}
+{#                                <p class="card-text">查看数据的统计和分析结果。</p>#}
+{#                                <a href="{% url 'geological_statistics' %}" class="btn btn-primary">进入</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <!-- 数据导出 -->#}
+{#                    <div class="col-md-4 mt-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">数据导出</h5>#}
+{#                                <p class="card-text">导出数据为Excel。</p>#}
+{#                                <a href="{% url 'export_geological_view' %}" class="btn btn-primary">进入</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <!-- 文件上传 -->#}
+{#                    <div class="col-md-4 mt-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">文件上传</h5>#}
+{#                                <p class="card-text">上传文件到系统中进行管理。</p>#}
+{#                                <a href="{% url 'upload' %}" class="btn btn-success">上传文件</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <!-- 文件预览 -->#}
+{#                    <div class="col-md-4 mt-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">文件预览</h5>#}
+{#                                <p class="card-text">查看上传文件的详细信息。</p>#}
+{#                                <a href="{% url 'preview' %}" class="btn btn-info">预览文件</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{##}
+{##}
+{##}
+{#        {% elif user.role == "auditor" %}#}
+{#            <!-- 审计员模块 -->#}
+{#            <div class="container mt-5">#}
+{#                <div class="row">#}
+{#                    <!-- 第一行 -->#}
+{#                    <!-- 查看审计日志 -->#}
+{#                    <div class="col-md-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">查看审计日志</h5>#}
+{#                                <p class="card-text">查看系统操作日志和审计信息。</p>#}
+{#                                <a href="{% url 'view_audit_logs' %}" class="btn btn-primary">进入</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <!-- 地质信息管理 -->#}
+{#                    <div class="col-md-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">地质信息管理</h5>#}
+{#                                <p class="card-text">查看和管理所有上传的地质信息。</p>#}
+{#                                <a href="{% url 'geological_list' %}" class="btn btn-primary">进入</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <!-- 文件预览 -->#}
+{#                    <div class="col-md-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">文件预览</h5>#}
+{#                                <p class="card-text">查看上传文件的详细信息。</p>#}
+{#                                <a href="{% url 'preview' %}" class="btn btn-primary">进入</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{##}
+{#                <div class="row mt-4">#}
+{#                    <!-- 第二行 -->#}
+{#                    <!-- 统计报表 -->#}
+{#                    <div class="col-md-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">统计报表</h5>#}
+{#                                <p class="card-text">查看数据的统计和分析结果。</p>#}
+{#                                <a href="{% url 'geological_statistics' %}" class="btn btn-primary">进入</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <!-- 数据导出 -->#}
+{#                    <div class="col-md-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">数据导出</h5>#}
+{#                                <p class="card-text">导出数据为Excel。</p>#}
+{#                                <a href="{% url 'export_geological_view' %}" class="btn btn-primary">进入</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{##}
+{#        {% else %}#}
+{#            <!-- 用户模块 -->#}
+{#            <!-- 分类：用户记录管理模块 -->#}
+{#            <div class="container mt-5">#}
+{#                <div class="row">#}
+{#                    <!-- 第一行 -->#}
+{#                    <!-- 我的数据记录 -->#}
+{#                    <div class="col-md-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">我的数据记录</h5>#}
+{#                                <p class="card-text">查看和管理您上传的所有数据。</p>#}
+{#                                <a href="{% url 'user_records_view' %}" class="btn btn-primary">查看记录</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <!-- 用户上传地质信息 -->#}
+{#                    <div class="col-md-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">用户上传地质信息</h5>#}
+{#                                <p class="card-text">测试用户上传地质信息功能。</p>#}
+{#                                <a href="{% url 'upload_geological_info_user' %}" class="btn btn-primary">进入</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <!-- 统计报表 -->#}
+{#                    <div class="col-md-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">统计报表</h5>#}
+{#                                <p class="card-text">查看数据的统计和分析结果。</p>#}
+{#                                <a href="{% url 'geological_statistics' %}" class="btn btn-primary">进入</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{##}
+{#                <div class="row mt-4">#}
+{#                    <!-- 第二行 -->#}
+{#                    <!-- 数据导出 -->#}
+{#                    <div class="col-md-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">数据导出</h5>#}
+{#                                <p class="card-text">导出数据为excel。</p>#}
+{#                                <a href="{% url 'export_geological_view' %}" class="btn btn-primary">进入</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <!-- 文件上传 -->#}
+{#                    <div class="col-md-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">文件上传</h5>#}
+{#                                <p class="card-text">上传文件到系统中进行管理。</p>#}
+{#                                <a href="{% url 'upload' %}" class="btn btn-primary">进入</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <!-- 文件预览 -->#}
+{#                    <div class="col-md-4">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body text-center">#}
+{#                                <h5 class="card-title">文件预览</h5>#}
+{#                                <p class="card-text">查看上传文件的详细信息。</p>#}
+{#                                <a href="{% url 'preview' %}" class="btn btn-primary">进入</a>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{##}
+{##}
+{#        {% endif %}#}
+{#    {% else %}#}
+{#        <h1 class="text-center">欢迎访问信息管理系统</h1>#}
+{#        <p class="text-center text-muted">请先登录以访问更多功能。</p>#}
+{#        <div class="text-center">#}
+{#            <a href="{% url 'login' %}" class="btn btn-success">登录</a>#}
+{#            <a href="{% url 'register' %}" class="btn btn-primary">注册</a>#}
+{#        </div>#}
+{#    {% endif %}#}
+{#</div>#}
+{##}
+{#<footer>#}
+{#    &copy; 2024 信息管理系统 - 版权所有#}
+{#</footer>#}
+{##}
+{#<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>#}
+{#<script>#}
+{#    document.addEventListener("DOMContentLoaded", function() {#}
+{#        const heroText = document.querySelector(".hero-section .container");#}
+{#        heroText.style.opacity = "0";#}
+{#        heroText.style.transform = "translateY(20px)";#}
+{#        setTimeout(() => {#}
+{#            heroText.style.transition = "all 1s ease-in-out";#}
+{#            heroText.style.opacity = "1";#}
+{#            heroText.style.transform = "translateY(0)";#}
+{#        }, 500);#}
+{#    });#}
+{#</script>#}
+{##}
+{#</body>#}
+{#</html>#}
+

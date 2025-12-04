@@ -1,0 +1,323 @@
+{#用户申请修改已审批数据的页面。#}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>申请修改已审批数据</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 900px;
+            margin-top: 50px;
+        }
+        .btn-custom {
+            width: 100%;
+        }
+        .card {
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            color: #007bff;
+            font-weight: bold;
+            text-align: center;
+            font-size: 2rem;
+        }
+        .card-body {
+            padding: 30px;
+            background-color: #fff;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        .form-control {
+            border-radius: 5px;
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+        }
+        .row .col-md-6 {
+            margin-bottom: 15px;
+        }
+        .text-center {
+            margin-top: 30px;
+        }
+    </style>
+    <style>
+        .error-popup {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff4d4f;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<div id="error-popup" class="error-popup"></div>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            申请修改已审批掌子面数据
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+
+                <!-- 掌子面编号和施工项目编号 -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="face_id" class="form-label">掌子面编号</label>
+{#                            <input type="text" class="form-control" id="face_id" name="face_id" value="{{ record.face_id }}" readonly>#}
+                              {#                              加上readonly就不能修改了#}
+                              <input type="text" class="form-control" id="face_id" name="face_id" value="{{ record.face_id }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="project_id" class="form-label">施工项目编号</label>
+                            <input type="text" class="form-control" id="project_id" name="project_id" value="{{ record.project_id }}" >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="inspector" class="form-label">测量人员</label>
+                            <input type="text" class="form-control" id="inspector" name="inspector" value="{{ record.inspector }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="rock_grade" class="form-label">岩层级别</label>
+                            <input type="text" class="form-control" id="rock_grade" name="rock_grade" value="{{ record.rock_grade }}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 检查日期和测量日期 -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="inspection_date" class="form-label">检查日期</label>
+                            <input type="date" class="form-control" id="inspection_date" name="inspection_date" value="{{ record.inspection_date }}" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="measurement_date" class="form-label">测量日期</label>
+                            <input type="date" class="form-control" id="measurement_date" name="measurement_date" value="{{ record.measurement_date }}" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 其他字段 -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="distance" class="form-label">里程</label>
+                            <input type="text" class="form-control" id="distance" name="distance" value="{{ record.distance }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="design_section" class="form-label">设计断面</label>
+                            <input type="text" class="form-control" id="design_section" name="design_section" value="{{ record.design_section }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="excavation_width" class="form-label">开挖宽度</label>
+                            <input type="text" class="form-control" id="excavation_width" name="excavation_width" value="{{ record.excavation_width }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="excavation_height" class="form-label">开挖高度</label>
+                            <input type="text" class="form-control" id="excavation_height" name="excavation_height" value="{{ record.excavation_height }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="excavation_area" class="form-label">开挖面积</label>
+                            <input type="text" class="form-control" id="excavation_area" name="excavation_area" value="{{ record.excavation_area }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="excavation_method" class="form-label">开挖方式</label>
+                            <input type="text" class="form-control" id="excavation_method" name="excavation_method" value="{{ record.excavation_method }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="face_condition" class="form-label">掌子面状态</label>
+                            <input type="text" class="form-control" id="face_condition" name="face_condition" value="{{ record.face_condition }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="excavation_condition" class="form-label">毛开挖情况</label>
+                            <input type="text" class="form-control" id="excavation_condition" name="excavation_condition" value="{{ record.excavation_condition }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="rock_strength" class="form-label">岩石强度</label>
+                            <input type="text" class="form-control" id="rock_strength" name="rock_strength" value="{{ record.rock_strength }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="weathering_degree" class="form-label">风化程度</label>
+                            <input type="text" class="form-control" id="weathering_degree" name="weathering_degree" value="{{ record.weathering_degree }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="crack_width" class="form-label">裂缝宽度</label>
+                            <input type="text" class="form-control" id="crack_width" name="crack_width" value="{{ record.crack_width }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="crack_shape" class="form-label">裂缝形态</label>
+                            <input type="text" class="form-control" id="crack_shape" name="crack_shape" value="{{ record.crack_shape }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="water_condition" class="form-label">渗水状态</label>
+                            <input type="text" class="form-control" id="water_condition" name="water_condition" value="{{ record.water_condition }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="rockburst_tendency" class="form-label">岩爆发育程度</label>
+                            <input type="text" class="form-control" id="rockburst_tendency" name="rockburst_tendency" value="{{ record.rockburst_tendency }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="karst_development" class="form-label">岩溶发育程度</label>
+                            <input type="text" class="form-control" id="karst_development" name="karst_development" value="{{ record.karst_development }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="water_status" class="form-label">消水状态</label>
+                            <input type="text" class="form-control" id="water_status" name="water_status" value="{{ record.water_status }}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 用户输入修改理由 -->
+                <div class="mb-3">
+                    <label for="operation_reason" class="form-label">申请修改理由</label>
+                    <textarea class="form-control" id="operation_reason" name="operation_reason" rows="4" placeholder="请输入申请修改理由" required></textarea>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-info btn-custom">提交修改申请</button>
+                    <a href="{% url 'user_records_view' %}" class="btn btn-secondary btn-custom mt-2">取消修改</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.querySelector("form").addEventListener("submit", function (event) {
+        event.preventDefault(); // 阻止表单提交
+
+        const requiredFields = [
+            { id: "face_id", name: "掌子面编号" },
+            { id: "project_id", name: "施工项目编号" },
+            { id: "inspector", name: "测量人员" },
+            { id: "rock_grade", name: "岩层级别" },
+            { id: "inspection_date", name: "检查日期" },
+            { id: "measurement_date", name: "测量日期" },
+            { id: "distance", name: "里程" },
+            { id: "design_section", name: "设计断面" },
+            { id: "excavation_width", name: "开挖宽度" },
+            { id: "excavation_height", name: "开挖高度" },
+            { id: "excavation_area", name: "开挖面积" },
+            { id: "excavation_method", name: "开挖方式" },
+            { id: "face_condition", name: "掌子面状态" },
+            { id: "excavation_condition", name: "毛开挖情况" },
+            { id: "rock_strength", name: "岩石强度" },
+            { id: "weathering_degree", name: "风化程度" },
+            { id: "crack_width", name: "裂缝宽度" },
+            { id: "crack_shape", name: "裂缝形态" },
+            { id: "water_condition", name: "渗水状态" },
+            { id: "rockburst_tendency", name: "岩爆发育程度" },
+            { id: "karst_development", name: "岩溶发育程度" },
+            { id: "water_status", name: "消水状态" },
+            { id: "operation_reason", name: "申请修改理由" },
+        ];
+
+        let missingFields = [];
+
+        requiredFields.forEach(function (field) {
+            const input = document.getElementById(field.id);
+            if (!input || input.value.trim() === "") {
+                missingFields.push(field.name);
+            }
+        });
+
+        if (missingFields.length > 0) {
+            showErrorPopup("请填写以下字段：" + missingFields.join(", "));
+        } else {
+            event.target.submit(); // 提交表单
+        }
+    });
+
+    function showErrorPopup(message) {
+        const popup = document.getElementById("error-popup");
+        popup.innerText = message;
+        popup.style.display = "block";
+
+        setTimeout(function () {
+            popup.style.display = "none";
+        }, 3000); // 3秒后自动隐藏
+    }
+</script>
+
+</body>
+</html>
+
+

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>掌子面记录管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .section-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .nav-link {
+            font-weight: bold;
+            color: #333;
+        }
+        .nav-link:hover {
+            color: #007bff;
+        }
+        .active-link {
+            border-bottom: 2px solid #007bff;
+            color: #007bff !important;
+        }
+        .table thead th {
+            background-color: #cce5ff;
+            color: black;
+            text-align: center;
+        }
+        .table tbody td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 页面标题 -->
+    <h2 class="text-center mb-4">我的掌子面记录管理</h2>
+
+    <!-- 主导航栏 -->
+    <nav class="nav justify-content-center mb-4">
+        <a class="nav-link {% if request.resolver_match.url_name == 'user_records_view' %}active-link{% endif %}" href="{% url 'user_records_view' %}">掌子面记录</a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'excavation_calculation_records' %}active-link{% endif %}" href="{% url 'excavation_calculation_records' %}">超欠挖计算记录</a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'excavation_diagnosis_records' %}active-link{% endif %}" href="{% url 'excavation_diagnosis_records' %}">超欠挖诊断记录</a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'tunnel_contour_records' %}active-link{% endif %}" href="{% url 'tunnel_contour_records' %}">隧道轮廓记录</a>
+    </nav>
+
+    <!-- Tab导航栏 -->
+    <ul class="nav nav-tabs justify-content-center mb-3" id="dataTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="new-tab" data-bs-toggle="tab" data-bs-target="#new" type="button" role="tab" aria-controls="new" aria-selected="true">新增待审批</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="modified-tab" data-bs-toggle="tab" data-bs-target="#modified" type="button" role="tab" aria-controls="modified" aria-selected="false">修改待审批</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="deleted-tab" data-bs-toggle="tab" data-bs-target="#deleted" type="button" role="tab" aria-controls="deleted" aria-selected="false">删除待审批</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button" role="tab" aria-controls="rejected" aria-selected="false">未通过审批</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved" type="button" role="tab" aria-controls="approved" aria-selected="false">有效数据</button>
+        </li>
+    </ul>
+
+    <!-- Tab内容 -->
+    <div class="tab-content" id="dataTabContent">
+
+        <form method="get" class="mb-4 d-flex">
+            <div class="input-group" style="flex-grow: 1;">
+                <input type="text" name="search" class="form-control" placeholder="请输入掌子面编号进行搜索" value="{{ search_query }}" style="border-radius: 20px 0 0 20px;">
+                <button type="submit" class="btn btn-primary" style="border-radius: 0 20px 20px 0; background-color: #6c9ecd; border: none;">搜索</button>
+            </div>
+            {% if search_query %}
+                <a href="{% url 'user_records_view' %}" class="btn btn-secondary ms-2" style="border-radius: 20px; background-color: #d9534f; border: none; color: white;">取消搜索</a>
+            {% endif %}
+        </form>
+
+
+        <!-- 新增待审批 -->
+        <div class="tab-pane fade show active" id="new" role="tabpanel" aria-labelledby="new-tab">
+            <h3 class="section-header">新增待审批</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>掌子面编号</th>
+                        <th>提交时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for record in pending_new_geological %}
+                        <tr>
+                            <td>{{ record.id }}</td>
+                            <td>{{ record.face_id }}</td>
+                            <td>{{ record.created_at }}</td>
+                            <td>新增待审批</td>
+                            <td>
+                                <a href="{% url 'edit_pending_record' record.id %}" class="btn btn-warning btn-sm">修改</a>
+                                <a href="{% url 'delete_pending_record' record.id %}" class="btn btn-danger btn-sm">删除</a>
+                                <a href="{% url 'view_GeologicalSketchRecord' record.id %}" class="btn btn-primary btn-sm">查看</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">暂无新增待审批数据</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- 分页 -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if pending_new_geological.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_new_page=1" aria-label="First">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_new_page={{ pending_new_geological.previous_page_number }}" aria-label="Previous">上一页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">首页</span></li>
+                        <li class="page-item disabled"><span class="page-link">上一页</span></li>
+                    {% endif %}
+                    {% for num in pending_new_geological.paginator.page_range %}
+                        {% if pending_new_geological.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?pending_new_page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if pending_new_geological.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_new_page={{ pending_new_geological.next_page_number }}" aria-label="Next">下一页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_new_page={{ pending_new_geological.paginator.num_pages }}" aria-label="Last">尾页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">下一页</span></li>
+                        <li class="page-item disabled"><span class="page-link">尾页</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+
+        </div>
+
+        <!-- 修改待审批 -->
+        <div class="tab-pane fade" id="modified" role="tabpanel" aria-labelledby="modified-tab">
+            <h3 class="section-header">修改待审批</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>掌子面编号</th>
+                        <th>提交时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for record in pending_modified_geological %}
+                        <tr>
+                            <td>{{ record.id }}</td>
+                            <td>{{ record.face_id }}</td>
+                            <td>{{ record.created_at }}</td>
+                            <td>修改待审批</td>
+                            <td>
+                                <a href="{% url 'edit_modified_pending_record' record.id %}" class="btn btn-warning btn-sm">修改</a>
+                                <a href="{% url 'delete_modified_pending_record' record.id %}" class="btn btn-danger btn-sm">删除</a>
+                                <a href="{% url 'view_GeologicalSketchRecord' record.id %}" class="btn btn-primary btn-sm">查看</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">暂无修改待审批数据</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- 分页 -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <!-- 首页按钮 -->
+                    {% if pending_modified_geological.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_modified_page=1" aria-label="First">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_modified_page={{ pending_modified_geological.previous_page_number }}" aria-label="Previous">上一页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">首页</span></li>
+                        <li class="page-item disabled"><span class="page-link">上一页</span></li>
+                    {% endif %}
+                    <!-- 页码按钮 -->
+                    {% for num in pending_modified_geological.paginator.page_range %}
+                        {% if pending_modified_geological.number == num %}
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?pending_modified_page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    <!-- 下一页和尾页按钮 -->
+                    {% if pending_modified_geological.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_modified_page={{ pending_modified_geological.next_page_number }}" aria-label="Next">下一页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_modified_page={{ pending_modified_geological.paginator.num_pages }}" aria-label="Last">尾页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">下一页</span></li>
+                        <li class="page-item disabled"><span class="page-link">尾页</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 删除待审批 -->
+        <div class="tab-pane fade" id="deleted" role="tabpanel" aria-labelledby="deleted-tab">
+            <h3 class="section-header">删除待审批</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>掌子面编号</th>
+                        <th>提交时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for record in pending_deleted_geological %}
+                        <tr>
+                            <td>{{ record.id }}</td>
+                            <td>{{ record.face_id }}</td>
+                            <td>{{ record.created_at }}</td>
+                            <td>删除待审批</td>
+                            <td>
+                                <a href="{% url 'delete_deleted_pending_record' record.id %}" class="btn btn-danger btn-sm">取消删除</a>
+                                <a href="{% url 'view_GeologicalSketchRecord' record.id %}" class="btn btn-primary btn-sm">查看</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">暂无删除待审批数据</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- 分页 -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <!-- 首页按钮 -->
+                    {% if pending_deleted_geological.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_deleted_page=1" aria-label="First">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_deleted_page={{ pending_deleted_geological.previous_page_number }}" aria-label="Previous">上一页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">首页</span></li>
+                        <li class="page-item disabled"><span class="page-link">上一页</span></li>
+                    {% endif %}
+                    <!-- 页码按钮 -->
+                    {% for num in pending_deleted_geological.paginator.page_range %}
+                        {% if pending_deleted_geological.number == num %}
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?pending_deleted_page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    <!-- 下一页和尾页按钮 -->
+                    {% if pending_deleted_geological.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_deleted_page={{ pending_deleted_geological.next_page_number }}" aria-label="Next">下一页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_deleted_page={{ pending_deleted_geological.paginator.num_pages }}" aria-label="Last">尾页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">下一页</span></li>
+                        <li class="page-item disabled"><span class="page-link">尾页</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 未通过审批 -->
+        <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab">
+            <h3 class="section-header">未通过审批</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>掌子面编号</th>
+                        <th>提交时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for record in rejected_geological %}
+                        <tr>
+                            <td>{{ record.id }}</td>
+                            <td>{{ record.face_id }}</td>
+                            <td>{{ record.created_at }}</td>
+                            <td>审批未通过</td>
+                            <td>
+                                <a href="{% url 'edit_record' record.id %}" class="btn btn-primary btn-sm">重新申请</a>
+                                <a href="{% url 'view_GeologicalSketchRecord' record.id %}" class="btn btn-primary btn-sm">查看</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">暂无未通过数据</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- 分页 -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <!-- 首页按钮 -->
+                    {% if rejected_geological.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?rejected_page=1" aria-label="First">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?rejected_page={{ rejected_geological.previous_page_number }}" aria-label="Previous">上一页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">首页</span></li>
+                        <li class="page-item disabled"><span class="page-link">上一页</span></li>
+                    {% endif %}
+                    <!-- 页码按钮 -->
+                    {% for num in rejected_geological.paginator.page_range %}
+                        {% if rejected_geological.number == num %}
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?rejected_page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    <!-- 下一页和尾页按钮 -->
+                    {% if rejected_geological.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?rejected_page={{ rejected_geological.next_page_number }}" aria-label="Next">下一页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?rejected_page={{ rejected_geological.paginator.num_pages }}" aria-label="Last">尾页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">下一页</span></li>
+                        <li class="page-item disabled"><span class="page-link">尾页</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 有效数据信息 -->
+        <div class="tab-pane fade" id="approved" role="tabpanel" aria-labelledby="approved-tab">
+            <h3 class="section-header">有效数据信息</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>掌子面编号</th>
+                        <th>审批时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for record in approved_geological %}
+                        <tr>
+                            <td>{{ record.id }}</td>
+                            <td>{{ record.face_id }}</td>
+                            <td>{{ record.updated_at }}</td>
+                            <td>已审批通过</td>
+                            <td>
+                                <a href="{% url 'apply_edit_record' record.id %}" class="btn btn-info btn-sm">申请修改</a>
+                                <a href="{% url 'apply_delete_record' record.id %}" class="btn btn-danger btn-sm">申请删除</a>
+                                <a href="{% url 'view_GeologicalSketchRecord' record.id %}" class="btn btn-primary btn-sm">查看</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">暂无有效数据</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- 分页 -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <!-- 首页按钮 -->
+                    {% if approved_geological.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?approved_page=1" aria-label="First">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?approved_page={{ approved_geological.previous_page_number }}" aria-label="Previous">上一页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">首页</span></li>
+                        <li class="page-item disabled"><span class="page-link">上一页</span></li>
+                    {% endif %}
+                    <!-- 页码按钮 -->
+                    {% for num in approved_geological.paginator.page_range %}
+                        {% if approved_geological.number == num %}
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?approved_page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    <!-- 下一页和尾页按钮 -->
+                    {% if approved_geological.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?approved_page={{ approved_geological.next_page_number }}" aria-label="Next">下一页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?approved_page={{ approved_geological.paginator.num_pages }}" aria-label="Last">尾页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">下一页</span></li>
+                        <li class="page-item disabled"><span class="page-link">尾页</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 检查是否有后端传递的消息
+    {% if request.session.message %}
+        let message = "{{ request.session.message|escapejs }}";
+        let messageType = "{{ request.session.message_type }}";
+
+        // 根据消息类型显示不同的弹框
+        if (messageType === "success") {
+            alert("✅ " + message);
+        } else if (messageType === "warning") {
+            alert("⚠️ " + message);
+        } else if (messageType === "error") {
+            alert("❌ " + message);
+        }
+
+        // 清除消息以防止刷新后再次显示
+        fetch("{% url 'clear_message' %}");
+    {% endif %}
+</script>
+<div class="text-center mt-4">
+    <a href="{% url 'index' %}" class="btn btn-secondary btn-lg px-5" style="border-radius: 0.5rem;">
+        返回
+    </a>
+</div>
+</body>
+</html>

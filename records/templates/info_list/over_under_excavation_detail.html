@@ -1,0 +1,170 @@
+{#超欠挖计算修改后详细信息展示#}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>超欠挖计算信息详情</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #0056b3;
+            border-bottom: 2px solid #e3f2fd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .table {
+            background-color: #f9fcff;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+
+        .table th {
+            background-color: #e3f2fd; /* 浅蓝色表头 */
+            color: #0056b3; /* 深蓝色文字 */
+            text-align: center;
+            font-weight: bold;
+            width: 40%; /* 左列占40% */
+        }
+
+        .table td {
+            text-align: center;
+            vertical-align: middle;
+            color: #495057; /* 深灰色 */
+            width: 60%; /* 右列占60% */
+        }
+
+        .table tbody tr:nth-child(odd) {
+            background-color: #f7faff; /* 偶数行背景色 */
+        }
+
+        .btn-back {
+            display: block;
+            margin: 20px auto;
+            width: 200px;
+            font-size: 1rem;
+            padding: 10px 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 顶部标题 -->
+    <h2 class="text-center mb-4">超欠挖计算信息详情</h2>
+
+    <!-- 基本信息 -->
+    <div class="section">
+        <h3 class="section-title">基本信息</h3>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>字段</th>
+                <th>值</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>超欠挖计算编号</td>
+                <td>{{ record.face_id }}</td>
+            </tr>
+            <tr>
+                <td>施工项目编号</td>
+                <td>{{ record.project_id }}</td>
+            </tr>
+            <tr>
+                <td>检查日期</td>
+                <td>{{ record.inspection_date }}</td>
+            </tr>
+            <tr>
+                <td>测量人员</td>
+                <td>{{ record.inspector }}</td>
+            </tr>
+            <tr>
+                <td>测量日期</td>
+                <td>{{ record.measurement_date }}</td>
+            </tr>
+            <tr>
+                <td>线路名称</td>
+                <td>{{ record.line_name }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 详细信息 -->
+    <div class="section">
+        <h3 class="section-title">详细信息</h3>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>字段</th>
+                <th>值</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>北方向角</td>
+                <td>{{ record.north_direction_angle }}</td>
+            </tr>
+            <tr>
+                <td>半径</td>
+                <td>{{ record.radius }}</td>
+            </tr>
+            <tr>
+                <td>长度</td>
+                <td>{{ record.length }}</td>
+            </tr>
+            <tr>
+                <td>东坐标</td>
+                <td>{{ record.east_coordinate }}</td>
+            </tr>
+            <tr>
+                <td>北坐标</td>
+                <td>{{ record.north_coordinate }}</td>
+            </tr>
+            <tr>
+                <td>起点偏移</td>
+                <td>{{ record.start_offset }}</td>
+            </tr>
+            <tr>
+                <td>高度</td>
+                <td>{{ record.height }}</td>
+            </tr>
+            <tr>
+                <td>横截面半径</td>
+                <td>{{ record.radius_section }}</td>
+            </tr>
+            <tr>
+                <td>角度增量</td>
+                <td>{{ record.angle_increment }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 返回按钮 -->
+    <a href="{% url 'excavation_calculation_list' %}" class="btn btn-secondary btn-back">返回列表</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

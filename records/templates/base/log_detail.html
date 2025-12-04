@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>操作数据详情</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #eef2f7;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            margin-top: 40px;
+            margin-bottom: 40px;
+            background-color: #ffffff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            background-color: #6c9ecd;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .row-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .data-block {
+            flex: 1 1 calc(12.5% - 10px); /* 每行最多显示 8 个 */
+            max-width: calc(12.5% - 10px);
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #dce1e7;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 14px;
+            word-wrap: break-word;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .data-block:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .data-block strong {
+            font-size: 14px;
+            color: #333333;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .data-block {
+                flex: 1 1 calc(25% - 10px); /* 中小屏幕每行展示 4 个 */
+            }
+        }
+
+        @media (max-width: 576px) {
+            .data-block {
+                flex: 1 1 calc(50% - 10px); /* 小屏幕每行展示 2 个 */
+            }
+        }
+
+        table {
+            font-size: 14px;
+            text-align: center;
+        }
+
+        table th, table td {
+            vertical-align: middle;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+            background-color: #f1f1f1;
+            margin-top: 40px;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 class="text-center mb-4">操作数据详情</h2>
+
+    <!-- 操作基本信息 -->
+    <div class="section-title">操作基本信息</div>
+    <table class="table table-bordered table-striped">
+        <tbody>
+        <tr>
+            <th>操作类型</th>
+            <td>{{ log.operation_type }}</td>
+        </tr>
+        <tr>
+            <th>操作时间</th>
+            <td>{{ log.operation_time }}</td>
+        </tr>
+        <tr>
+            <th>操作表</th>
+            <td>{{ log.table_name }}</td>
+        </tr>
+        <tr>
+            <th>操作记录 ID</th>
+            <td>{{ log.record_id }}</td>
+        </tr>
+        <tr>
+            <th>操作用户</th>
+            <td>{{ log.user.username }}</td>
+        </tr>
+        <tr>
+            <th>客户端 IP</th>
+            <td>{{ log.client_ip|default:"未知" }}</td>
+        </tr>
+        <tr>
+            <th>操作原因</th>
+            <td>{{ log.operation_reason|default:"无" }}</td>
+        </tr>
+        <tr>
+            <th>批准者</th>
+            <td>{{ log.approved_by.username|default:"管理员操作，无需批准" }}</td>
+        </tr>
+        <tr>
+            <th>批准理由</th>
+            <td>{{ log.approval_reason|default:"无" }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 提示信息 -->
+    {% if log.operation_type == "CREATE" %}
+        <div class="alert alert-info text-center" role="alert">
+            这是一个新增操作，因此仅展示操作后的数据。
+        </div>
+    {% elif log.operation_type == "DELETE" %}
+        <div class="alert alert-warning text-center" role="alert">
+            这是一个删除操作，因此仅展示操作前的数据。
+        </div>
+    {% endif %}
+
+
+    <!-- 操作前数据 -->
+    {% if data_snapshot %}
+        <div class="section-title">操作前数据</div>
+        <div class="row-wrapper">
+            {% for key, value in data_snapshot.items %}
+                <div class="data-block">
+                    <strong>{{ key }}</strong>
+                    <span>{{ value }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- 操作后数据 -->
+    {% if updated_data %}
+        <div class="section-title">操作后数据</div>
+        <div class="row-wrapper">
+            {% for key, value in updated_data.items %}
+                <div class="data-block">
+                    <strong>{{ key }}</strong>
+                    <span>{{ value }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if change_details %}
+        <div class="section-title">变更详情</div>
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>属性名</th>
+                <th>原始值</th>
+                <th>当前值</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for key, value in change_details.items %}
+                {% if key != 'modified_by' %}  {# 跳过 modified_by 字段 #}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td>{{ value.old|default:"无" }}</td>
+                        <td>{{ value.new|default:"无" }}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+
+
+
+    <div class="text-center mt-4">
+        <a href="{% url 'view_audit_logs' %}" class="btn btn-secondary">返回日志列表</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

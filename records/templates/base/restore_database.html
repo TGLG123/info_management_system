@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据库恢复</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #e8f4fc; /* 浅蓝色背景 */
+            font-family: "Arial", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            margin-top: 50px;
+            margin-bottom: 50px;
+            max-width: 600px;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #6c9ecd; /* 淡蓝色 */
+            color: white;
+            text-align: center;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            padding: 20px;
+            font-size: 1.5rem;
+        }
+        .form-label {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .btn-restore {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+        .btn-restore:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+        #status-message {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header text-center">
+            数据库恢复
+        </div>
+        <div class="card-body">
+            <!-- 显示 noscript 提示 -->
+            <noscript>
+                <div class="alert alert-danger text-center">
+                    请启用 JavaScript 以使用恢复功能。
+                </div>
+            </noscript>
+
+            <!-- 显示备份文件列表 -->
+            <form id="restore-form" method="post" action="">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="form-label">选择备份文件：</label>
+                    <div class="form-check">
+                        {% for file in backup_files %}
+                            <div class="mb-2">
+                                <input
+                                        type="radio"
+                                        class="form-check-input"
+                                        name="backup_file"
+                                        id="file-{{ forloop.counter }}"
+                                        value="{{ file }}"
+                                        required>
+                                <label class="form-check-label" for="file-{{ forloop.counter }}">
+                                    {{ file }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- 按钮组 -->
+                <div class="d-flex justify-content-center align-items-center mt-4">
+                    <!-- 恢复数据库按钮 -->
+                    <button type="submit" class="btn btn-restore btn-lg px-5 me-3">
+                        <span class="spinner-border spinner-border-sm d-none" id="loading-icon" role="status" aria-hidden="true"></span>
+                        恢复数据库
+                    </button>
+
+                    <!-- 返回首页按钮 -->
+                    <a href="{% url 'index' %}" class="btn btn-secondary btn-lg px-5">返回首页</a>
+                </div>
+            </form>
+
+            <!-- 状态显示 -->
+            <div id="status-message" class="mt-4"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("restore-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const backupFile = document.querySelector("input[name='backup_file']:checked")?.value;
+        const statusMessage = document.getElementById("status-message");
+        const submitButton = this.querySelector("button[type='submit']");
+        const loadingIcon = document.getElementById("loading-icon");
+
+        // 清空之前的状态消息
+        statusMessage.innerHTML = "";
+
+        // 检查是否选择了备份文件
+        if (!backupFile) {
+            statusMessage.innerHTML = `<div class="alert alert-warning">请选择一个备份文件。</div>`;
+            return;
+        }
+
+        // 检查文件格式
+        if (!backupFile.endsWith(".json")) {
+            statusMessage.innerHTML = `<div class="alert alert-warning">备份文件格式不正确，请选择正确的 .json 文件。</div>`;
+            return;
+        }
+
+        // 启用加载状态
+        submitButton.disabled = true;
+        loadingIcon.classList.remove("d-none");
+        submitButton.textContent = "正在恢复...";
+
+        // 提交表单数据
+        fetch("", {
+            method: "POST",
+            body: formData,
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    statusMessage.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                } else {
+                    const details = data.details && Array.isArray(data.details)
+                        ? `<ul>${data.details.map(msg => `<li>${msg}</li>`).join("")}</ul>`
+                        : "";
+                    statusMessage.innerHTML = `<div class="alert alert-danger">${data.message}${details}</div>`;
+                }
+            })
+            .catch(error => {
+                console.error("恢复失败：", error);
+                statusMessage.innerHTML = `<div class="alert alert-danger">恢复失败，请稍后重试。</div>`;
+            })
+            .finally(() => {
+                // 关闭加载状态
+                submitButton.disabled = false;
+                loadingIcon.classList.add("d-none");
+                submitButton.textContent = "恢复数据库";
+            });
+    });
+</script>
+</body>
+</html>

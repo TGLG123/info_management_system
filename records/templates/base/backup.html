@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据库备份</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #e8f4fc; /* 浅蓝色背景 */
+            font-family: "Arial", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            margin-top: 50px;
+            margin-bottom: 50px;
+            max-width: 600px;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #6c9ecd; /* 淡蓝色 */
+            color: white;
+            text-align: center;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            padding: 20px;
+            font-size: 1.5rem;
+        }
+        .form-check-label {
+            font-size: 1.2rem;
+            margin-left: 10px;
+        }
+        .form-check-input {
+            transform: scale(1.5); /* 放大复选框 */
+            margin-right: 10px;
+        }
+        .btn-backup {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+        .btn-backup:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+        #backup-status {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header text-center">
+            数据库备份
+        </div>
+        <div class="card-body">
+            <!-- 表选择 -->
+            <h5 class="mb-4">请选择需要备份的表：</h5>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="GeologicalSketchRecord" id="GeologicalSketchRecord">
+                <label class="form-check-label" for="GeologicalSketchRecord">GeologicalSketchRecord</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="OverUnderExcavationCalculation" id="OverUnderExcavationCalculation">
+                <label class="form-check-label" for="OverUnderExcavationCalculation">OverUnderExcavationCalculation</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="ExcavationDiagnosis" id="ExcavationDiagnosis">
+                <label class="form-check-label" for="ExcavationDiagnosis">ExcavationDiagnosis</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="TunnelContourInfo" id="TunnelContourInfo">
+                <label class="form-check-label" for="TunnelContourInfo">TunnelContourInfo</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="DataStorage" id="DataStorage">
+                <label class="form-check-label" for="DataStorage">DataStorage</label>
+            </div>
+
+
+            <!-- 状态显示区域 -->
+            <div id="backup-status"></div>
+
+            <!-- 按钮组 -->
+            <div class="d-flex justify-content-center align-items-center mt-4">
+                <!-- 手动备份按钮 -->
+                <button id="backup-button" class="btn btn-backup btn-lg px-5 me-3">开始备份</button>
+
+                <!-- 返回按钮 -->
+                <a href="{% url 'index' %}" class="btn btn-secondary btn-lg px-5">返回首页</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.getElementById('backup-button').addEventListener('click', function () {
+        const statusDiv = document.getElementById('backup-status');
+        const selectedTables = [];
+        document.querySelectorAll('.form-check-input:checked').forEach(input => {
+            selectedTables.push(input.value);
+        });
+
+        console.log("选中的表：", selectedTables); // 调试输出
+
+        // 检查是否选择了表
+        if (selectedTables.length === 0) {
+            statusDiv.innerHTML = `<div class="alert alert-warning">请至少选择一个表进行备份！</div>`;
+            return;
+        }
+
+        // 发送备份请求
+        fetch("{% url 'backup' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ table_names: selectedTables })  // 转为 JSON 格式
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const fileList = data.results
+                        .map(result => result.status === 'success'
+                            ? `<li>${result.message} - <strong>${result.file}</strong></li>`
+                            : `<li>${result.message}</li>`)
+                        .join("");
+                    statusDiv.innerHTML = `
+                <div class="alert alert-success">
+                    备份完成！<br>
+                    <strong>详细信息：</strong>
+                    <ul>${fileList}</ul>
+                </div>`;
+                } else {
+                    statusDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                }
+            })
+            .catch(error => {
+                console.error('备份请求失败：', error);
+                statusDiv.innerHTML = `<div class="alert alert-danger">备份请求失败，请稍后重试。</div>`;
+            });
+    });
+</script>
+</body>
+</html>

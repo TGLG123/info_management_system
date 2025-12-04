@@ -1,0 +1,585 @@
+{#<!DOCTYPE html>#}
+{#<html lang="zh-CN">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <title>超欠挖诊断统计信息</title>#}
+{#    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">#}
+{#    <style>#}
+{#        body {#}
+{#            background-color: #f8f9fa;#}
+{#        }#}
+{#        .container {#}
+{#            margin-top: 50px;#}
+{#            padding-bottom: 30px;#}
+{#        }#}
+{#        .chart-container {#}
+{#            text-align: center;#}
+{#            margin-top: 40px;#}
+{#            background: white;#}
+{#            padding: 20px;#}
+{#            border-radius: 10px;#}
+{#            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);#}
+{#        }#}
+{#        .chart-title {#}
+{#            font-weight: bold;#}
+{#            margin-bottom: 15px;#}
+{#            font-size: 1.2rem;#}
+{#            color: #333;#}
+{#        }#}
+{#        .statistics-list {#}
+{#            margin-top: 30px;#}
+{#            padding: 20px;#}
+{#            background: white;#}
+{#            border-radius: 10px;#}
+{#            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);#}
+{#        }#}
+{#        .statistics-list h4 {#}
+{#            color: #007bff;#}
+{#        }#}
+{#        .statistics-list ul {#}
+{#            list-style-type: none;#}
+{#            padding-left: 0;#}
+{#        }#}
+{#        .statistics-list ul li {#}
+{#            padding: 8px 0;#}
+{#            border-bottom: 1px solid #eaeaea;#}
+{#        }#}
+{#        .statistics-list ul li:last-child {#}
+{#            border-bottom: none;#}
+{#        }#}
+{#        .chart-container img {#}
+{#            max-width: 100%;#}
+{#            height: auto;#}
+{#            border-radius: 8px;#}
+{#            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);#}
+{#        }#}
+{#        footer {#}
+{#            margin-top: 50px;#}
+{#            padding: 10px 0;#}
+{#            background: #007bff;#}
+{#            color: white;#}
+{#            text-align: center;#}
+{#            border-top-left-radius: 10px;#}
+{#            border-top-right-radius: 10px;#}
+{#        }#}
+{#    </style>#}
+{#</head>#}
+{#<body>#}
+{##}
+{#<nav class="navbar navbar-expand-lg navbar-light bg-light">#}
+{#    <div class="container-fluid">#}
+{#        <a class="navbar-brand" href="#">统计报表系统</a>#}
+{#        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">#}
+{#            <span class="navbar-toggler-icon"></span>#}
+{#        </button>#}
+{#        <div class="collapse navbar-collapse" id="navbarNav">#}
+{#            <ul class="navbar-nav">#}
+{#                <li class="nav-item">#}
+{#                    <a class="nav-link" href="{% url 'geological_statistics' %}">掌子面统计</a>#}
+{#                </li>#}
+{#                <li class="nav-item">#}
+{#                    <a class="nav-link" href="{% url 'excavation_statistics' %}">超欠挖计算统计</a>#}
+{#                </li>#}
+{#                <li class="nav-item">#}
+{#                    <a class="nav-link" href="{% url 'diagnosis_statistics' %}">超欠挖诊断统计</a>#}
+{#                </li>#}
+{#                <li class="nav-item">#}
+{#                    <a class="nav-link" href="{% url 'tunnel_statistics' %}">隧道轮廓统计</a>#}
+{#                </li>#}
+{#            </ul>#}
+{#        </div>#}
+{#    </div>#}
+{#</nav>#}
+{##}
+{#<div class="container">#}
+{#    <h2 class="text-center mb-4">#}
+{#        {% if is_admin %}#}
+{#            <span class="badge bg-primary">全局</span> 超欠挖诊断统计报表#}
+{#        {% else %}#}
+{#            <span class="badge bg-success">我的</span> 超欠挖诊断统计报表#}
+{#        {% endif %}#}
+{#    </h2>#}
+{##}
+{#    <!-- 统计指标 -->#}
+{#    <div class="statistics-list">#}
+{#        <h4>统计信息</h4>#}
+{#        <ul class="list-group">#}
+{#            <li class="list-group-item d-flex justify-content-between align-items-center">#}
+{#                上传记录数#}
+{#                <span class="badge bg-primary">{{ statistics.record_count }}</span>#}
+{#            </li>#}
+{#            <li class="list-group-item d-flex justify-content-between align-items-center">#}
+{#                平均超挖面积#}
+{#                <span class="badge bg-success">{{ statistics.over_excavation_area_avg|default:"暂无数据" }}</span>#}
+{#            </li>#}
+{#            <li class="list-group-item d-flex justify-content-between align-items-center">#}
+{#                平均欠挖面积#}
+{#                <span class="badge bg-info">{{ statistics.under_excavation_area_avg|default:"暂无数据" }}</span>#}
+{#            </li>#}
+{#            <li class="list-group-item d-flex justify-content-between align-items-center">#}
+{#                最大超挖值#}
+{#                <span class="badge bg-warning text-dark">{{ statistics.max_over_excavation|default:"暂无数据" }}</span>#}
+{#            </li>#}
+{#            <li class="list-group-item d-flex justify-content-between align-items-center">#}
+{#                最大欠挖值#}
+{#                <span class="badge bg-danger">{{ statistics.max_under_excavation|default:"暂无数据" }}</span>#}
+{#            </li>#}
+{#        </ul>#}
+{#    </div>#}
+{##}
+{#    <!-- 图表部分 -->#}
+{#    <div class="chart-container">#}
+{#        <h4 class="chart-title">超挖面积分布</h4>#}
+{#        {% if charts.over_excavation_distribution %}#}
+{#            <img src="data:image/png;base64,{{ charts.over_excavation_distribution }}" alt="超挖面积分布">#}
+{#        {% else %}#}
+{#            <p class="text-muted">暂无数据</p>#}
+{#        {% endif %}#}
+{#    </div>#}
+{##}
+{#    <div class="chart-container">#}
+{#        <h4 class="chart-title">欠挖面积分布</h4>#}
+{#        {% if charts.under_excavation_distribution %}#}
+{#            <img src="data:image/png;base64,{{ charts.under_excavation_distribution }}" alt="欠挖面积分布">#}
+{#        {% else %}#}
+{#            <p class="text-muted">暂无数据</p>#}
+{#        {% endif %}#}
+{#    </div>#}
+{##}
+{#    <div class="chart-container">#}
+{#        <h4 class="chart-title">最大超挖和最大欠挖随时间变化趋势</h4>#}
+{#        {% if charts.excavation_trend %}#}
+{#            <img src="data:image/png;base64,{{ charts.excavation_trend }}" alt="超挖欠挖趋势">#}
+{#        {% else %}#}
+{#            <p class="text-muted">暂无数据</p>#}
+{#        {% endif %}#}
+{#    </div>#}
+{#</div>#}
+{##}
+{#<footer>#}
+{#    © 2025 超欠挖诊断统计系统 - 全部数据实时统计#}
+{#</footer>#}
+{##}
+{#<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>#}
+{#</body>#}
+{#</html>#}
+
+
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>超欠挖诊断统计信息</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .left-sidebar {
+            width: 200px;
+            background: #343a40;
+            color: white;
+            height: 100vh;
+            padding-top: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .left-sidebar .nav-link {
+            color: white;
+            margin: 10px 0;
+            transition: color 0.3s ease;
+        }
+
+        .left-sidebar .nav-link:hover {
+            color: #007bff;
+        }
+
+        .right-content {
+            margin-left: 200px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            grid-template-rows: auto auto;
+            padding-bottom: 60px; /* 为固定的 footer 留出空间 */
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .chart-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            color: #333;
+            text-align: center;
+        }
+
+        footer {
+            margin-left: 200px;
+            padding: 10px 0;
+            background: #007bff;
+            color: white;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: calc(100% - 200px);
+        }
+
+        @media (max-width: 768px) {
+            .right-content {
+                grid-template-columns: 1fr;
+                margin-left: 0;
+            }
+
+            .left-sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+
+            footer {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <!-- 左侧导航栏 -->
+    <div class="left-sidebar">
+        <h3 class="text-center text-white mb-4">统计报表系统</h3>
+        <nav>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'geological_statistics' %}">掌子面统计</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'excavation_statistics' %}">超欠挖计算统计</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'diagnosis_statistics' %}">超欠挖诊断统计</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'tunnel_statistics' %}">隧道轮廓统计</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'index' %}">返回</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- 右侧内容 -->
+    <div class="right-content">
+        <div class="chart-container">
+            <h4 class="chart-title">超欠挖面积分布</h4>
+            <canvas id="areaDistChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h4 class="chart-title">面积相关性分析</h4>
+            <canvas id="correlationChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h4 class="chart-title">月度峰值统计</h4>
+            <canvas id="peakValueChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h4 class="chart-title">时间序列分析</h4>
+            <canvas id="timeSeriesChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<footer>
+    © 2025 超欠挖诊断统计系统 - 全部数据实时统计
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 面积分布图（环形图）
+    var ctx1 = document.getElementById('areaDistChart').getContext('2d');
+    var areaDistChart = new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+            labels: ['超挖面积', '欠挖面积'],
+            datasets: [{
+                data: [
+                    {{ statistics.over_excavation_area_avg|default:0|floatformat:2 }},
+                    {{ statistics.under_excavation_area_avg|default:0|floatformat:2 }}
+                ],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(54, 162, 235, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20
+                    }
+                },
+                title: {
+                    display: true,
+                    text: '超欠挖面积比例分布',
+                    font: {
+                        size: 16
+                    }
+                }
+            },
+            cutout: '60%'
+        }
+    });
+
+    // 相关性分析图（散点图）
+    var ctx2 = document.getElementById('correlationChart').getContext('2d');
+    var correlationChart = new Chart(ctx2, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: '面积相关性',
+                data: {{ statistics.scatter_data|safe|default:"[]" }},
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                title: {
+                    display: true,
+                    text: '超挖与欠挖面积相关性',
+                    font: {
+                        size: 16
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `超挖: ${context.raw.x.toFixed(2)}m², 欠挖: ${context.raw.y.toFixed(2)}m²`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: '超挖面积 (m²)'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: '欠挖面积 (m²)'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                }
+            }
+        }
+    });
+
+    // 峰值统计图（柱状图）
+    var ctx3 = document.getElementById('peakValueChart').getContext('2d');
+    var peakValueChart = new Chart(ctx3, {
+        type: 'bar',
+        data: {
+            labels: {{ statistics.months|safe|default:"[]" }},
+            datasets: [{
+                label: '最大超挖值',
+                data: {{ statistics.monthly_data.max_over|safe|default:"[]" }},
+                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }, {
+                label: '最大欠挖值',
+                data: {{ statistics.monthly_data.max_under|safe|default:"[]" }},
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                title: {
+                    display: true,
+                    text: '月度峰值变化',
+                    font: {
+                        size: 16
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: '深度 (m)'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                }
+            }
+        }
+    });
+
+    // 时间序列分析图
+    var ctx4 = document.getElementById('timeSeriesChart').getContext('2d');
+    var timeSeriesChart = new Chart(ctx4, {
+        type: 'line',
+        data: {
+            labels: {{ statistics.time_series.dates|safe|default:"[]" }},
+            datasets: [{
+                label: '超挖面积',
+                data: {{ statistics.time_series.over|safe|default:"[]" }},
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                yAxisID: 'y1'
+            }, {
+                label: '欠挖面积',
+                data: {{ statistics.time_series.under|safe|default:"[]" }},
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                yAxisID: 'y1'
+            }, {
+                label: '累计变化趋势',
+                data: {{ statistics.time_series.cumulative|safe|default:"[]" }},
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: false,
+                tension: 0.4,
+                yAxisID: 'y2'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                title: {
+                    display: true,
+                    text: '超欠挖时间序列分析',
+                    font: {
+                        size: 16
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            if (context.datasetIndex === 2) {
+                                return `累计趋势: ${context.raw.toFixed(2)}m²`;
+                            }
+                            return `${context.dataset.label}: ${context.raw.toFixed(2)}m²`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: '日期'
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: '面积 (m²)'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                y2: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: '累计变化 (m²)'
+                    },
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

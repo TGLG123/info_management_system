@@ -1,0 +1,398 @@
+{#超欠挖诊断#}
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上传超欠挖诊断信息</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            display: flex;
+            justify-content: center;
+            background-color: #007bff;
+            padding: 10px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 5px 10px;
+        }
+        .navbar a.active {
+            background-color: #ffdd57;
+            border-radius: 5px;
+        }
+        .container {
+            max-width: 1200px;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #343a40;
+            font-weight: bold;
+        }
+        .btn-primary {
+            width: 100%;
+            font-size: 16px;
+            padding: 10px;
+        }
+        .img-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .img-container img {
+            width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<div class="navbar">
+    <a href="{% url 'index' %}">首页</a>
+    <a href="{% url 'upload_geological_info' %}">掌子面</a>
+    <a href="{% url 'upload_info3' %}">超欠挖计算</a>
+    <a href="{% url 'upload_info2' %}">超欠挖诊断</a>
+    <a href="{% url 'upload_info1' %}">隧道信息</a>
+</div>
+
+<div class="container">
+    <h2 class="text-center mb-4">上传超欠挖诊断信息</h2>
+    <div class="row">
+        <!-- 左侧图片 -->
+        <div class="col-md-6">
+            <div class="img-container">
+                <img src="{% static 'images/img_7.png' %}" alt="超欠挖诊断图像">
+                <p>超欠挖诊断图像</p>
+            </div>
+            <div class="img-container">
+                <img src="{% static 'images/img_8.png' %}" alt="诊断检测图像">
+                <p>诊断检测图像</p>
+            </div>
+        </div>
+
+        <!-- 右侧表单 -->
+{#        <div class="col-md-6">#}
+{#            <form method="post">#}
+{#                {% csrf_token %}#}
+{#                {% if errors %}#}
+{#                    <div class="alert alert-danger">#}
+{#                        <ul>#}
+{#                            {% for field, error in errors.items %}#}
+{#                                <li>{{ field }}: {{ error|join:", " }}</li>#}
+{#                            {% endfor %}#}
+{#                        </ul>#}
+{#                    </div>#}
+{#                {% endif %}#}
+{#                <div class="row">#}
+{#                    <!-- 超欠挖诊断编号 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.face_id.label_tag }} <!-- 超欠挖诊断编号 -->#}
+{#                        {{ form.face_id }}#}
+{#                    </div>#}
+{#                    <!-- 施工项目编号 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.project_id.label_tag }} <!-- 施工项目编号 -->#}
+{#                        {{ form.project_id }}#}
+{#                    </div>#}
+{#                    <!-- 测量日期 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.measurement_date.label_tag }} <!-- 测量日期 -->#}
+{#                        {{ form.measurement_date }}#}
+{#                    </div>#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.inspection_date.label_tag }} <!-- 检查日期 -->#}
+{#                        {{ form.inspection_date }}#}
+{#                    </div>#}
+{#                    <!-- 比例尺 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.scale.label_tag }} <!-- 比例尺 -->#}
+{#                        {{ form.scale }}#}
+{#                    </div>#}
+{#                    <!-- 里程 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.mileage.label_tag }} <!-- 里程 -->#}
+{#                        {{ form.mileage }}#}
+{#                    </div>#}
+{#                    <!-- 设计断面 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.design_section.label_tag }} <!-- 设计断面 -->#}
+{#                        {{ form.design_section }}#}
+{#                    </div>#}
+{#                    <!-- 线路X坐标 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.line_x.label_tag }} <!-- 线路X坐标 -->#}
+{#                        {{ form.line_x }}#}
+{#                    </div>#}
+{#                    <!-- 线路Y坐标 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.line_y.label_tag }} <!-- 线路Y坐标 -->#}
+{#                        {{ form.line_y }}#}
+{#                    </div>#}
+{#                    <!-- 实测断面面积 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.measured_section.label_tag }} <!-- 实测断面面积 -->#}
+{#                        {{ form.measured_section }}#}
+{#                    </div>#}
+{#                    <!-- 参考断面面积 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.reference_section.label_tag }} <!-- 参考断面面积 -->#}
+{#                        {{ form.reference_section }}#}
+{#                    </div>#}
+{#                    <!-- 线路高程 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.line_height.label_tag }} <!-- 线路高程 -->#}
+{#                        {{ form.line_height }}#}
+{#                    </div>#}
+{#                    <!-- 超挖面积 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.over_excavation_area.label_tag }} <!-- 超挖面积 -->#}
+{#                        {{ form.over_excavation_area }}#}
+{#                    </div>#}
+{#                    <!-- 欠挖面积 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.under_excavation_area.label_tag }} <!-- 欠挖面积 -->#}
+{#                        {{ form.under_excavation_area }}#}
+{#                    </div>#}
+{#                    <!-- 最大超挖 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.max_over_excavation.label_tag }} <!-- 最大超挖 -->#}
+{#                        {{ form.max_over_excavation }}#}
+{#                    </div>#}
+{#                    <!-- 最大欠挖 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.max_under_excavation.label_tag }} <!-- 最大欠挖 -->#}
+{#                        {{ form.max_under_excavation }}#}
+{#                    </div>#}
+{#                    <!-- 平均超挖 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.average_over_excavation.label_tag }} <!-- 平均超挖 -->#}
+{#                        {{ form.average_over_excavation }}#}
+{#                    </div>#}
+{#                    <!-- 平均欠挖 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.average_under_excavation.label_tag }} <!-- 平均欠挖 -->#}
+{#                        {{ form.average_under_excavation }}#}
+{#                    </div>#}
+{#                    <!-- 诊断结果 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.diagnosis_result.label_tag }} <!-- 诊断结果 -->#}
+{#                        {{ form.diagnosis_result }}#}
+{#                    </div>#}
+{#                    <!-- 测量人员 -->#}
+{#                    <div class="col-md-6 mb-3">#}
+{#                        {{ form.inspector.label_tag }} <!-- 测量人员 -->#}
+{#                        {{ form.inspector }}#}
+{#                    </div>#}
+{#                </div>#}
+{#                <!-- 提交按钮居中 -->#}
+{#                <div class="form-container d-flex justify-content-center mt-4">#}
+{#                    <button type="submit" class="btn btn-primary w-50">提交</button>#}
+{#                </div>#}
+{#            </form>#}
+{#        </div>#}
+
+
+        <div class="col-md-6">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% if errors %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for field, error in errors.items %}
+                                <li>{{ field }}: {{ error|join:", " }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div id="form-section">
+                    <div class="row">
+                        <!-- 超欠挖诊断编号 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.face_id.label_tag }} <!-- 超欠挖诊断编号 -->
+                            {{ form.face_id }}
+                        </div>
+                        <!-- 施工项目编号 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.project_id.label_tag }} <!-- 施工项目编号 -->
+                            {{ form.project_id }}
+                        </div>
+                        <!-- 测量日期 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.measurement_date.label_tag }} <!-- 测量日期 -->
+                            {{ form.measurement_date }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.inspection_date.label_tag }} <!-- 检查日期 -->
+                            {{ form.inspection_date }}
+                        </div>
+                        <!-- 比例尺 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.scale.label_tag }} <!-- 比例尺 -->
+                            {{ form.scale }}
+                        </div>
+                        <!-- 里程 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.mileage.label_tag }} <!-- 里程 -->
+                            {{ form.mileage }}
+                        </div>
+                        <!-- 设计断面 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.design_section.label_tag }} <!-- 设计断面 -->
+                            {{ form.design_section }}
+                        </div>
+                        <!-- 线路X坐标 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.line_x.label_tag }} <!-- 线路X坐标 -->
+                            {{ form.line_x }}
+                        </div>
+                        <!-- 线路Y坐标 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.line_y.label_tag }} <!-- 线路Y坐标 -->
+                            {{ form.line_y }}
+                        </div>
+                        <!-- 实测断面面积 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.measured_section.label_tag }} <!-- 实测断面面积 -->
+                            {{ form.measured_section }}
+                        </div>
+                        <!-- 参考断面面积 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.reference_section.label_tag }} <!-- 参考断面面积 -->
+                            {{ form.reference_section }}
+                        </div>
+                        <!-- 线路高程 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.line_height.label_tag }} <!-- 线路高程 -->
+                            {{ form.line_height }}
+                        </div>
+                        <!-- 超挖面积 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.over_excavation_area.label_tag }} <!-- 超挖面积 -->
+                            {{ form.over_excavation_area }}
+                        </div>
+                        <!-- 欠挖面积 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.under_excavation_area.label_tag }} <!-- 欠挖面积 -->
+                            {{ form.under_excavation_area }}
+                        </div>
+                        <!-- 最大超挖 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.max_over_excavation.label_tag }} <!-- 最大超挖 -->
+                            {{ form.max_over_excavation }}
+                        </div>
+                        <!-- 最大欠挖 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.max_under_excavation.label_tag }} <!-- 最大欠挖 -->
+                            {{ form.max_under_excavation }}
+                        </div>
+                        <!-- 平均超挖 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.average_over_excavation.label_tag }} <!-- 平均超挖 -->
+                            {{ form.average_over_excavation }}
+                        </div>
+                        <!-- 平均欠挖 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.average_under_excavation.label_tag }} <!-- 平均欠挖 -->
+                            {{ form.average_under_excavation }}
+                        </div>
+                        <!-- 诊断结果 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.diagnosis_result.label_tag }} <!-- 诊断结果 -->
+                            {{ form.diagnosis_result }}
+                        </div>
+                        <!-- 测量人员 -->
+                        <div class="col-md-6 mb-3">
+                            {{ form.inspector.label_tag }} <!-- 测量人员 -->
+                            {{ form.inspector }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 文件上传部分 -->
+                <div class="form-group mt-3" id="bulk-upload-section" style="display: none;">
+                    <label for="excel_file" class="form-label">选择 Excel 文件</label>
+                    <input type="file" name="excel_file" id="excel_file" class="form-control" accept=".xls,.xlsx">
+                </div>
+
+                <!-- 提交按钮 -->
+                <div class="d-flex justify-content-between mt-3">
+                    <button type="submit" name="submit_type" value="single" class="btn btn-primary w-100" id="single-submit-btn">提交单条记录</button>
+                    <button type="submit" name="submit_type" value="bulk" class="btn btn-success w-100" id="bulk-submit-btn" style="display: none;">批量提交</button>
+                </div>
+                <!-- 切换按钮 -->
+                <button type="button" id="switch-to-bulk" class="btn btn-secondary w-100 mt-3">切换到批量导入</button>
+                <button type="button" id="switch-to-single" class="btn btn-secondary w-100 mt-3" style="display: none;">切换到单条记录提交</button>
+            </form>
+        </div>
+
+
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 切换到批量导入模式
+    document.getElementById('switch-to-bulk').addEventListener('click', function () {
+        // 隐藏单条提交按钮，显示批量提交按钮
+        document.getElementById('single-submit-btn').style.display = 'none';
+        document.getElementById('bulk-submit-btn').style.display = 'block';
+
+        // 显示文件上传部分
+        document.getElementById('bulk-upload-section').style.display = 'block';
+
+        // 隐藏“切换到批量导入”按钮，显示“切换到单条记录提交”按钮
+        document.getElementById('switch-to-bulk').style.display = 'none';
+        document.getElementById('switch-to-single').style.display = 'block';
+
+        // 锁定单条记录表单中的所有字段
+        document.querySelectorAll('#form-section input, #form-section select').forEach(function (field) {
+            field.setAttribute('readonly', true);
+            field.setAttribute('disabled', true);
+        });
+    });
+
+    // 切换到单条记录提交模式
+    document.getElementById('switch-to-single').addEventListener('click', function () {
+        // 显示单条提交按钮，隐藏批量提交按钮
+        document.getElementById('single-submit-btn').style.display = 'block';
+        document.getElementById('bulk-submit-btn').style.display = 'none';
+
+        // 隐藏文件上传部分
+        document.getElementById('bulk-upload-section').style.display = 'none';
+
+        // 显示“切换到批量导入”按钮，隐藏“切换到单条记录提交”按钮
+        document.getElementById('switch-to-bulk').style.display = 'block';
+        document.getElementById('switch-to-single').style.display = 'none';
+
+        // 解锁单条记录表单中的所有字段
+        document.querySelectorAll('#form-section input, #form-section select').forEach(function (field) {
+            field.removeAttribute('readonly');
+            field.removeAttribute('disabled');
+        });
+    });
+</script>
+
+<div class="mt-3 text-center">
+    <!-- 返回主界面按钮 -->
+    <a href="{% url 'index' %}" class="btn btn-secondary mx-2">返回首页</a>
+</div>
+</body>
+</html>
+
+
+
+

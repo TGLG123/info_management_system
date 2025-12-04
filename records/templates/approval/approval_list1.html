@@ -1,0 +1,517 @@
+{#管理员页面，超欠挖计算待审批的#}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>审批列表</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .nav-tabs {
+            border-bottom: 2px solid #dee2e6;
+        }
+        .nav-tabs .nav-link {
+            border: none;
+            color: #495057;
+            font-weight: bold;
+        }
+        .nav-tabs .nav-link.active {
+            color: #007bff;
+            border-bottom: 3px solid #007bff;
+        }
+        .tab-content {
+            margin-top: 20px;
+        }
+        .table {
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .btn-approve {
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+        }
+        .btn-reject {
+            color: #fff;
+            background-color: #dc3545;
+            border: none;
+        }
+        .fade {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .fade.show {
+            display: block;
+            opacity: 1;
+        }
+
+        /* 弹框整体样式 */
+        .reason-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.2);  /* 改为更轻的阴影 */
+            width: 400px;
+            max-width: 90%;
+            z-index: 1050;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 弹框内容样式 */
+        .reason-popup-content {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* 弹框的阴影 */
+            position: relative;
+            width: 100%;
+        }
+
+        /* 弹框头部样式 */
+        .popup-header {
+            display: flex;
+            justify-content: space-between; /* 左右布局 */
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+        }
+
+        .popup-header h5 {
+            margin: 0;
+            font-size: 1.5rem; /* 更大的标题字体 */
+            color: #333;
+        }
+
+        /* 关闭按钮样式 */
+        .close-popup {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #555;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-popup:hover {
+            color: #000;
+        }
+
+        /* 弹框内容样式 */
+        .popup-body {
+            max-height: 400px; /* 限制内容最大高度 */
+            overflow-y: auto;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            text-align: left;
+            font-size: 1.1rem; /* 内容字体稍大 */
+            color: #555;
+            line-height: 1.6; /* 增加行高让内容更易读 */
+        }
+
+        /* 弹框动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="#">审批系统</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'approval_list' %}active fw-bold text-primary{% endif %}" href="{% url 'approval_list' %}">
+                        掌子面审批
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'approval_list1' %}active fw-bold text-primary{% endif %}" href="{% url 'approval_list1' %}">
+                        超欠挖计算审批
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'approval_list2' %}active fw-bold text-primary{% endif %}" href="{% url 'approval_list2' %}">
+                        超欠挖诊断审批
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'approval_list3' %}active fw-bold text-primary{% endif %}" href="{% url 'approval_list3' %}">
+                        隧道轮廓审批
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h2 class="text-center mb-4">超欠挖计算信息审批列表</h2>
+
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs justify-content-center" id="approvalTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="new-tab" data-bs-toggle="tab" data-bs-target="#new" type="button" role="tab" aria-controls="new" aria-selected="true">
+                新增待审批
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="modified-tab" data-bs-toggle="tab" data-bs-target="#modified" type="button" role="tab" aria-controls="modified" aria-selected="false">
+                修改待审批
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="deleted-tab" data-bs-toggle="tab" data-bs-target="#deleted" type="button" role="tab" aria-controls="deleted" aria-selected="false">
+                删除待审批
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="approvalTabsContent">
+
+        <form method="get" class="mb-4 d-flex">
+            <div class="input-group" style="flex-grow: 1;">
+                <input type="text" name="search" class="form-control" placeholder="请输入超欠挖计算编号或提交人进行搜索" value="{{ search_query }}" style="border-radius: 20px 0 0 20px;">
+                <button type="submit" class="btn btn-primary" style="border-radius: 0 20px 20px 0; background-color: #6c9ecd; border: none;">搜索</button>
+            </div>
+            {% if search_query %}
+                <a href="{% url 'approval_list1' %}" class="btn btn-secondary ms-2" style="border-radius: 20px; background-color: #d9534f; border: none;">取消搜索</a>
+            {% endif %}
+        </form>
+
+
+        <!-- New Pending -->
+        <div class="tab-pane fade show active" id="new" role="tabpanel" aria-labelledby="new-tab">
+            <h4 class="section-title">新增待审批记录</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>超欠挖计算编号</th>
+                        <th>提交人</th>
+                        <th>提交时间</th>
+                        <th>新增理由</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for record in pending_new_excavation_calc %}
+                        <tr>
+                            <td>{{ record.id }}</td>
+                            <td>{{ record.face_id }}</td>
+                            <td>{{ record.created_by.username }}</td>
+                            <td>{{ record.created_at }}</td>
+
+                            <!-- 操作理由显示 -->
+                            <td>
+                            <span class="operation-reason-short" style="color: #007bff; text-decoration: underline; cursor: pointer;" onclick="showOperationReason('{{ record.operation_reason|escapejs }}')">
+                                {{ record.operation_reason|truncatechars:20 }}
+                            </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'approve_over_under_excavation' record.id %}" class="btn btn-approve btn-sm">进行审批</a>
+                                <a href="{% url 'reject_over_under_calculation' record.id %}" class="btn btn-reject btn-sm">驳回</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">暂无新增待审批记录</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <nav class="mt-3">
+                <ul class="pagination justify-content-center">
+                    <!-- 判断是否有上一页 -->
+                    {% if pending_new_excavation_calc.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?new_page=1">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?new_page={{ pending_new_excavation_calc.previous_page_number }}">上一页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">首页</span></li>
+                        <li class="page-item disabled"><span class="page-link">上一页</span></li>
+                    {% endif %}
+
+                    <!-- 页码范围 -->
+                    {% for num in pending_new_excavation_calc.paginator.page_range %}
+                        {% if pending_new_excavation_calc.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?new_page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- 判断是否有下一页 -->
+                    {% if pending_new_excavation_calc.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?new_page={{ pending_new_excavation_calc.next_page_number }}">下一页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?new_page={{ pending_new_excavation_calc.paginator.num_pages }}">尾页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">下一页</span></li>
+                        <li class="page-item disabled"><span class="page-link">尾页</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Modified Pending -->
+        <div class="tab-pane fade" id="modified" role="tabpanel" aria-labelledby="modified-tab">
+            <h4 class="section-title">修改待审批记录</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>超欠挖计算编号</th>
+                        <th>提交人</th>
+                        <th>提交时间</th>
+                        <th>修改理由</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for record in pending_modified_excavation_calc %}
+                        <tr>
+                            <td>{{ record.id }}</td>
+                            <td>{{ record.face_id }}</td>
+                            <td>{{ record.created_by.username }}</td>
+                            <td>{{ record.updated_at }}</td>
+
+                            <!-- 修改理由显示 -->
+                            <td>
+                        <span class="operation-reason-short" style="color: #007bff; text-decoration: underline; cursor: pointer;" onclick="showOperationReason('{{ record.operation_reason|escapejs }}')">
+                            {{ record.operation_reason|truncatechars:20 }}
+                        </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'approve_over_under_excavation' record.id %}" class="btn btn-approve btn-sm">进行审批</a>
+                                <a href="{% url 'reject_over_under_calculation' record.id %}" class="btn btn-reject btn-sm">驳回</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">暂无修改待审批记录</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+            <!-- Pagination -->
+            <nav class="mt-3">
+                <ul class="pagination justify-content-center">
+                    <!-- 首页和上一页 -->
+                    {% if pending_modified_excavation_calc.has_previous %}
+                        <li class="page-item">
+                            <!-- 首页链接，指向第一页 -->
+                            <a class="page-link" href="?modified_page=1">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <!-- 上一页链接 -->
+                            <a class="page-link" href="?modified_page={{ pending_modified_excavation_calc.previous_page_number }}">上一页</a>
+                        </li>
+                    {% else %}
+                        <!-- 禁用状态的首页和上一页 -->
+                        <li class="page-item disabled"><span class="page-link">首页</span></li>
+                        <li class="page-item disabled"><span class="page-link">上一页</span></li>
+                    {% endif %}
+
+                    <!-- 页码范围 -->
+                    {% for num in pending_modified_excavation_calc.paginator.page_range %}
+                        {% if pending_modified_excavation_calc.number == num %}
+                            <!-- 当前页高亮 -->
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% else %}
+                            <!-- 其他页链接 -->
+                            <li class="page-item">
+                                <a class="page-link" href="?modified_page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- 下一页和尾页 -->
+                    {% if pending_modified_excavation_calc.has_next %}
+                        <li class="page-item">
+                            <!-- 下一页链接 -->
+                            <a class="page-link" href="?modified_page={{ pending_modified_excavation_calc.next_page_number }}">下一页</a>
+                        </li>
+                        <li class="page-item">
+                            <!-- 尾页链接，指向最后一页 -->
+                            <a class="page-link" href="?modified_page={{ pending_modified_excavation_calc.paginator.num_pages }}">尾页</a>
+                        </li>
+                    {% else %}
+                        <!-- 禁用状态的下一页和尾页 -->
+                        <li class="page-item disabled"><span class="page-link">下一页</span></li>
+                        <li class="page-item disabled"><span class="page-link">尾页</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Deleted Pending -->
+        <div class="tab-pane fade" id="deleted" role="tabpanel" aria-labelledby="deleted-tab">
+            <h4 class="section-title">删除待审批记录</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>超欠挖计算编号</th>
+                        <th>提交人</th>
+                        <th>提交时间</th>
+                        <th>删除理由</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for record in pending_deleted_excavation_calc %}
+                        <tr>
+                            <td>{{ record.id }}</td>
+                            <td>{{ record.face_id }}</td>
+                            <td>{{ record.created_by.username }}</td>
+                            <td>{{ record.updated_at }}</td>
+
+                            <!-- 删除理由显示 -->
+                            <td>
+                        <span class="operation-reason-short" style="color: #007bff; text-decoration: underline; cursor: pointer;" onclick="showOperationReason('{{ record.operation_reason|escapejs }}')">
+                            {{ record.operation_reason|truncatechars:20 }}
+                        </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'approve_over_under_excavation' record.id %}" class="btn btn-approve btn-sm">进行审批</a>
+                                <a href="{% url 'reject_over_under_calculation' record.id %}" class="btn btn-reject btn-sm">驳回</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">暂无删除待审批记录</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+            <nav class="mt-3">
+                <ul class="pagination justify-content-center">
+                    {% if pending_deleted_excavation_calc.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?deleted_page=1">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?deleted_page={{ pending_deleted_excavation_calc.previous_page_number }}">上一页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">首页</span></li>
+                        <li class="page-item disabled"><span class="page-link">上一页</span></li>
+                    {% endif %}
+
+                    {% for num in pending_deleted_excavation_calc.paginator.page_range %}
+                        {% if pending_deleted_excavation_calc.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?deleted_page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if pending_deleted_excavation_calc.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?deleted_page={{ pending_deleted_excavation_calc.next_page_number }}">下一页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?deleted_page={{ pending_deleted_excavation_calc.paginator.num_pages }}">尾页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">下一页</span></li>
+                        <li class="page-item disabled"><span class="page-link">尾页</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+{#完整理由展示#}
+<div id="reasonPopup" class="reason-popup">
+    <div class="reason-popup-content">
+        <div class="popup-header">
+            <h5>完整操作理由</h5>
+            <span class="close-popup" onclick="closeReasonPopup()">&times;</span>
+        </div>
+        <div class="popup-body">
+            <p id="reasonText"></p>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // JavaScript 用于弹出框逻辑
+    function showOperationReason(reason) {
+        // 获取弹出框和内容元素
+        const popup = document.getElementById('reasonPopup');
+        const reasonText = document.getElementById('reasonText');
+
+        // 设置弹出框内容
+        reasonText.innerText = reason;
+
+        // 显示弹出框
+        popup.style.display = 'block';
+        popup.classList.add('show-popup');
+    }
+
+    // 关闭弹出框
+    function closeReasonPopup() {
+        const popup = document.getElementById('reasonPopup');
+        popup.style.display = 'none';
+        popup.classList.remove('show-popup');
+    }
+</script>
+
+<div class="text-center mt-4">
+    <a href="{% url 'index' %}" class="btn btn-secondary btn-lg px-5" style="border-radius: 0.5rem;">
+        返回
+    </a>
+</div>
+</body>
+</html>

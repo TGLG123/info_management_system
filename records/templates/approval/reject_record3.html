@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>驳回审批</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 800px;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .btn-danger {
+            width: 100%;
+            background-color: #dc3545;
+            border-color: #dc3545;
+            font-size: 16px;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #c82333;
+        }
+        .card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #495057;
+        }
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .data-item {
+            flex: 0 0 48%; /* 控制每列宽度 */
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+        .data-item strong {
+            color: #495057;
+        }
+        textarea {
+            resize: none;
+        }
+        .bg-light-primary {
+            background-color: #b3d8ff;
+            color: #333;
+        }
+        .bg-light-secondary {
+            background-color: #d9dee2;
+            color: #333;
+        }
+        .bg-light-success {
+            background-color: #bdeccb;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="text-center mb-4">驳回隧道信息审批</h2>
+    <p class="text-center mb-4">您正在驳回以下记录：</p>
+
+    <!-- 记录信息展示 -->
+    <div class="card">
+        <div class="card-header bg-light-primary">
+            记录详情
+        </div>
+        <div class="card-body">
+            <div class="data-row">
+                <div class="data-item"><strong>隧道编号：</strong> {{ record.face_id }}</div>
+                <div class="data-item"><strong>施工项目编号：</strong> {{ record.project_id }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>检查日期：</strong> {{ record.inspection_date }}</div>
+                <div class="data-item"><strong>测量人员：</strong> {{ record.inspector }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>测量日期：</strong> {{ record.measurement_date }}</div>
+                <div class="data-item"><strong>调整指数范围 Cr：</strong> {{ record.cr }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>权重值 w1：</strong> {{ record.w1 }}</div>
+                <div class="data-item"><strong>权重值 w2：</strong> {{ record.w2 }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>权重值 w3：</strong> {{ record.w3 }}</div>
+                <div class="data-item"><strong>超挖深度 Od：</strong> {{ record.od }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>轮廓粗糙度 RCL：</strong> {{ record.rcl }}</div>
+                <div class="data-item"><strong>纵向超挖变化 Vo：</strong> {{ record.vo }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>修正因子 c1：</strong> {{ record.c1 }}</div>
+                <div class="data-item"><strong>修正因子 c2：</strong> {{ record.c2 }}</div>
+            </div>
+            <div class="data-row">
+                <div class="data-item"><strong>修正因子 c3：</strong> {{ record.c3 }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 用户操作理由展示 -->
+    <div class="card">
+        <div class="card-header bg-light-secondary">
+            用户操作理由
+        </div>
+        <div class="card-body">
+            <textarea class="form-control" rows="4" readonly>{{ record.operation_reason }}</textarea>
+        </div>
+    </div>
+
+    <!-- 驳回理由输入 -->
+    <div class="card">
+        <div class="card-header bg-light-success">
+            驳回理由
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="4" placeholder="请输入驳回理由" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-danger">确认驳回</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 返回审批列表 -->
+    <div class="mt-3 text-center">
+        <a href="{% url 'approval_list3' %}" class="btn btn-secondary">返回审批列表</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

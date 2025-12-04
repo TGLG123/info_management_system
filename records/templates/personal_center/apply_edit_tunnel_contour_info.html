@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>申请修改隧道轮廓信息数据</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 900px;
+            margin-top: 50px;
+        }
+        .btn-custom {
+            width: 100%;
+        }
+        .card {
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            color: #007bff;
+            font-weight: bold;
+            text-align: center;
+            font-size: 2rem;
+        }
+        .card-body {
+            padding: 30px;
+            background-color: #fff;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        .form-control {
+            border-radius: 5px;
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+        }
+        .row .col-md-6 {
+            margin-bottom: 15px;
+        }
+        .text-center {
+            margin-top: 30px;
+        }
+    </style>
+    <style>
+        .error-popup {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff4d4f;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            font-size: 16px;
+            animation: fadeInOut 3s ease-in-out;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            10%, 90% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+<div id="error-popup" class="error-popup"></div>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            申请修改隧道轮廓信息数据
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="face_id" class="form-label">隧道编号</label>
+                            <input type="text" class="form-control" id="face_id" name="face_id" value="{{ record.face_id }}" placeholder="请输入隧道编号">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="project_id" class="form-label">施工项目编号</label>
+                            <input type="text" class="form-control" id="project_id" name="project_id" value="{{ record.project_id }}" placeholder="请输入施工项目编号">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="inspection_date" class="form-label">检查日期</label>
+                            <input type="date" class="form-control" id="inspection_date" name="inspection_date" value="{{ record.inspection_date }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="inspector" class="form-label">测量人员</label>
+                            <input type="text" class="form-control" id="inspector" name="inspector" value="{{ record.inspector }}" placeholder="请输入测量人员">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="measurement_date" class="form-label">测量日期</label>
+                            <input type="date" class="form-control" id="measurement_date" name="measurement_date" value="{{ record.measurement_date }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="cr" class="form-label">调整指数范围的常数 Cr</label>
+                            <input type="number" class="form-control" id="cr" name="cr" value="{{ record.cr }}" placeholder="请输入调整指数范围的常数 Cr">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="w1" class="form-label">权重值 w1</label>
+                            <input type="number" class="form-control" id="w1" name="w1" value="{{ record.w1 }}" placeholder="请输入权重值 w1">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="w2" class="form-label">权重值 w2</label>
+                            <input type="number" class="form-control" id="w2" name="w2" value="{{ record.w2 }}" placeholder="请输入权重值 w2">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="w3" class="form-label">权重值 w3</label>
+                            <input type="number" class="form-control" id="w3" name="w3" value="{{ record.w3 }}" placeholder="请输入权重值 w3">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="od" class="form-label">超挖深度 Od</label>
+                            <input type="number" class="form-control" id="od" name="od" value="{{ record.od }}" placeholder="请输入超挖深度 Od">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="rcl" class="form-label">轮廓粗糙度 RCL</label>
+                            <input type="number" class="form-control" id="rcl" name="rcl" value="{{ record.rcl }}" placeholder="请输入轮廓粗糙度 RCL">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="vo" class="form-label">纵向超挖变化 Vo</label>
+                            <input type="number" class="form-control" id="vo" name="vo" value="{{ record.vo }}" placeholder="请输入纵向超挖变化 Vo">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="c1" class="form-label">修正因子 c1</label>
+                            <input type="number" class="form-control" id="c1" name="c1" value="{{ record.c1 }}" placeholder="请输入修正因子 c1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="c2" class="form-label">修正因子 c2</label>
+                            <input type="number" class="form-control" id="c2" name="c2" value="{{ record.c2 }}" placeholder="请输入修正因子 c2">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="c3" class="form-label">修正因子 c3</label>
+                            <input type="number" class="form-control" id="c3" name="c3" value="{{ record.c3 }}" placeholder="请输入修正因子 c3">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="operation_reason" class="form-label">操作理由</label>
+                    <textarea class="form-control" id="operation_reason" name="operation_reason" rows="3">{{ record.operation_reason }}</textarea>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-info btn-custom">提交修改申请</button>
+                    <a href="{% url 'user_records_view' %}" class="btn btn-secondary btn-custom mt-2">取消修改</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.querySelector("form").addEventListener("submit", function (event) {
+        event.preventDefault(); // 阻止表单的默认提交行为
+
+        // 定义需要验证的字段
+        const requiredFields = [
+            { id: "face_id", name: "隧道编号" },
+            { id: "project_id", name: "施工项目编号" },
+            { id: "inspection_date", name: "检查日期" },
+            { id: "inspector", name: "测量人员" },
+            { id: "measurement_date", name: "测量日期" },
+            { id: "cr", name: "调整指数范围的常数 Cr" },
+            { id: "w1", name: "权重值 w1" },
+            { id: "w2", name: "权重值 w2" },
+            { id: "w3", name: "权重值 w3" },
+            { id: "od", name: "超挖深度 Od" },
+            { id: "rcl", name: "轮廓粗糙度 RCL" },
+            { id: "vo", name: "纵向超挖变化 Vo" },
+            { id: "c1", name: "修正因子 c1" },
+            { id: "c2", name: "修正因子 c2" },
+            { id: "c3", name: "修正因子 c3" },
+            { id: "operation_reason", name: "操作理由" },
+        ];
+
+        // 检查未填写的字段
+        let missingFields = [];
+        requiredFields.forEach(function (field) {
+            const input = document.getElementById(field.id);
+            if (!input || input.value.trim() === "") {
+                missingFields.push(field.name);
+            }
+        });
+
+        // 如果有未填写的字段，显示提示框
+        if (missingFields.length > 0) {
+            showErrorPopup("请填写以下字段：" + missingFields.join(", "));
+        } else {
+            event.target.submit(); // 所有字段都已填写，提交表单
+        }
+    });
+
+    // 显示错误提示框
+    function showErrorPopup(message) {
+        const popup = document.getElementById("error-popup");
+        popup.innerText = message;
+        popup.style.display = "block";
+
+        setTimeout(function () {
+            popup.style.display = "none"; // 3秒后隐藏提示框
+        }, 3000);
+    }
+</script>
+
+</body>
+</html>
